@@ -293,62 +293,9 @@ export function PostEditor({
 
         {/* CONTENT TAB */}
         <TabsContent value="content" className="space-y-4">
-          <div className="grid gap-4 lg:grid-cols-[1fr_280px]">
-            <div className="space-y-4 order-1 lg:order-none">
-              <div>
-                <Label htmlFor="title">عنوان</Label>
-                <Input
-                  id="title"
-                  value={data.title}
-                  onChange={(e) => onTitleChange(e.target.value)}
-                  placeholder="یک عنوان جذاب و واضح…"
-                  className="mt-1.5 text-lg"
-                />
-              </div>
-              <div>
-                <Label htmlFor="slug">نشانک (URL)</Label>
-                <div className="ltr-field mt-1.5 flex items-center gap-2 rounded-md border border-input bg-background px-3 py-1">
-                  <span className="shrink-0 font-mono text-sm text-muted-foreground">/blog/</span>
-                  <Input
-                    id="slug"
-                    dir="ltr"
-                    value={data.slug}
-                    onChange={(e) => update({ slug: slugify(e.target.value) })}
-                    placeholder="my-article"
-                    className="border-0 bg-transparent px-0 font-mono shadow-none focus-visible:ring-0"
-                  />
-                </div>
-              </div>
-              <div>
-                <Label htmlFor="excerpt">خلاصه</Label>
-                <Textarea
-                  id="excerpt"
-                  value={data.excerpt}
-                  onChange={(e) => update({ excerpt: e.target.value })}
-                  placeholder="یک یا دو جمله برای معرفی مقاله…"
-                  rows={2}
-                  className="mt-1.5"
-                />
-                <p className="mt-1 text-xs text-muted-foreground">{data.excerpt.length}/400</p>
-              </div>
-
-              <div>
-                <Label>محتوا</Label>
-                <div className="admin-mdx-editor mt-1.5 overflow-hidden rounded-xl border border-border" dir="rtl">
-                  <MdxEditorErrorBoundary onRetry={() => setEditorSession((n) => n + 1)}>
-                    <PostMdxEditor
-                      editorKey={editorKey}
-                      editorRef={mdxRef}
-                      initialMarkdown={contentRef.current}
-                      onMarkdownChange={handleContentChange}
-                    />
-                  </MdxEditorErrorBoundary>
-                </div>
-              </div>
-            </div>
-
-            {/* Sidebar — publish settings */}
-            <aside className="order-2 space-y-4 lg:order-none">
+          <div className="grid gap-4 lg:grid-cols-[280px_minmax(0,1fr)]" dir="ltr">
+            {/* Sidebar — physical left; editor content stays RTL */}
+            <aside className="space-y-4" dir="rtl">
               <div className="rounded-xl border border-border bg-card p-4">
                 <Label>وضعیت</Label>
                 <Select value={data.status} onValueChange={(v) => update({ status: v })}>
@@ -425,6 +372,59 @@ export function PostEditor({
                 )}
               </div>
             </aside>
+
+            <div className="min-w-0 space-y-4" dir="rtl">
+              <div>
+                <Label htmlFor="title">عنوان</Label>
+                <Input
+                  id="title"
+                  value={data.title}
+                  onChange={(e) => onTitleChange(e.target.value)}
+                  placeholder="یک عنوان جذاب و واضح…"
+                  className="mt-1.5 text-lg"
+                />
+              </div>
+              <div>
+                <Label htmlFor="slug">نشانک (URL)</Label>
+                <div className="ltr-field mt-1.5 flex items-center gap-2 rounded-md border border-input bg-background px-3 py-1">
+                  <span className="shrink-0 font-mono text-sm text-muted-foreground">/blog/</span>
+                  <Input
+                    id="slug"
+                    dir="ltr"
+                    value={data.slug}
+                    onChange={(e) => update({ slug: slugify(e.target.value) })}
+                    placeholder="my-article"
+                    className="border-0 bg-transparent px-0 font-mono shadow-none focus-visible:ring-0"
+                  />
+                </div>
+              </div>
+              <div>
+                <Label htmlFor="excerpt">خلاصه</Label>
+                <Textarea
+                  id="excerpt"
+                  value={data.excerpt}
+                  onChange={(e) => update({ excerpt: e.target.value })}
+                  placeholder="یک یا دو جمله برای معرفی مقاله…"
+                  rows={2}
+                  className="mt-1.5"
+                />
+                <p className="mt-1 text-xs text-muted-foreground">{data.excerpt.length}/400</p>
+              </div>
+
+              <div>
+                <Label>محتوا</Label>
+                <div className="admin-mdx-editor mt-1.5 overflow-hidden rounded-xl border border-border" dir="rtl">
+                  <MdxEditorErrorBoundary onRetry={() => setEditorSession((n) => n + 1)}>
+                    <PostMdxEditor
+                      editorKey={editorKey}
+                      editorRef={mdxRef}
+                      initialMarkdown={contentRef.current}
+                      onMarkdownChange={handleContentChange}
+                    />
+                  </MdxEditorErrorBoundary>
+                </div>
+              </div>
+            </div>
           </div>
         </TabsContent>
 
