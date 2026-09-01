@@ -38,6 +38,7 @@ import {
   PostMdxEditor,
   sanitizeEditorMarkdown,
 } from "@/components/admin/post-mdx-editor";
+import { PublishSuccessModal } from "@/components/admin/publish-success-modal";
 
 type Category = { id: string; name: string; slug: string };
 type Tag = { id: string; name: string; slug: string };
@@ -104,6 +105,8 @@ export function PostEditor({
     }
   );
   const [saving, setSaving] = React.useState(false);
+  const [publishSuccessOpen, setPublishSuccessOpen] = React.useState(false);
+  const pendingRedirectRef = React.useRef<string | null>(null);
   const [activeTab, setActiveTab] = React.useState("content");
   const [contentStats, setContentStats] = React.useState(() => {
     const words = contentRef.current.split(/\s+/).filter(Boolean).length;
@@ -222,13 +225,24 @@ export function PostEditor({
         toast({ variant: "destructive", title: "خطا", description: result.error ?? "ذخیره نشد" });
         return;
       }
-      toast({ title: "ذخیره شد", description: "مقاله با موفقیت ذخیره شد" });
+
       const saved = result.post;
+      const isPublish = overrideStatus === "PUBLISHED";
+
+      if (isPublish) {
+        pendingRedirectRef.current =
+          !data.id && saved?.id ? `/admin/posts/${saved.id}/edit` : null;
+        setPublishSuccessOpen(true);
+      } else {
+        toast({ title: "ذخیره شد", description: "مقاله با موفقیت ذخیره شد" });
+      }
+
       if (saved) {
         setData((prev) => ({
           ...prev,
           id: saved.id ?? prev.id,
           slug: saved.slug ?? prev.slug,
+          status: isPublish ? "PUBLISHED" : prev.status,
           seoTitle: saved.seoTitle ?? prev.seoTitle,
           metaDescription: saved.metaDescription ?? prev.metaDescription,
           canonicalUrl: saved.canonicalUrl ?? prev.canonicalUrl,
@@ -237,8 +251,11 @@ export function PostEditor({
           ogImage: saved.ogImage ?? prev.ogImage,
           focusKeyword: saved.focusKeyword ?? prev.focusKeyword,
         }));
+      } else if (isPublish) {
+        update({ status: "PUBLISHED" });
       }
-      if (!data.id && result.post?.id) {
+
+      if (!isPublish && !data.id && result.post?.id) {
         router.push(`/admin/posts/${result.post.id}/edit`);
       }
     } catch {
@@ -246,6 +263,13 @@ export function PostEditor({
     } finally {
       setSaving(false);
     }
+  };
+
+  const handlePublishSuccessClose = () => {
+    setPublishSuccessOpen(false);
+    const redirect = pendingRedirectRef.current;
+    pendingRedirectRef.current = null;
+    if (redirect) router.push(redirect);
   };
 
   const remove = async () => {
@@ -614,6 +638,14 @@ export function PostEditor({
           </div>
         </TabsContent>
       </Tabs>
+
+      <PublishSuccessModal
+        open={publishSuccessOpen}
+        onClose={handlePublishSuccessClose}
+        title="مقاله منتشر شد!"
+        description="مقاله با موفقیت منتشر شد و اکنون در سایت قابل مشاهده است."
+        duration={5}
+      />
     </div>
   );
 }

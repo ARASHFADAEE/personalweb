@@ -80,6 +80,7 @@ export async function SiteFooter({ settings }: { settings: Settings }) {
               <li><Link href="/projects" className="transition-colors hover:text-foreground">پروژه‌ها</Link></li>
               <li><Link href="/about" className="transition-colors hover:text-foreground">درباره‌ی من</Link></li>
               <li><Link href="/rss.xml" className="transition-colors hover:text-foreground">RSS Feed</Link></li>
+              <li><Link href="/sitemap.xml" className="transition-colors hover:text-foreground">نقشه سایت</Link></li>
             </ul>
           </div>
 

@@ -1,7 +1,9 @@
 import { db } from "@/lib/db";
+import { publishedIndexableWhere } from "@/lib/data/posts";
 import { getSettings } from "@/lib/data/settings";
 import { getSiteUrl } from "@/lib/site-url";
 
+export const dynamic = "force-dynamic";
 export const revalidate = 3600;
 
 export async function GET() {
@@ -9,11 +11,7 @@ export async function GET() {
   const settings = await getSettings();
 
   const posts = await db.post.findMany({
-    where: {
-      status: "PUBLISHED",
-      publishedAt: { lte: new Date() },
-      robotsNoindex: false,
-    },
+    where: publishedIndexableWhere(),
     orderBy: { publishedAt: "desc" },
     take: 30,
     include: { category: true, author: { select: { name: true } } },

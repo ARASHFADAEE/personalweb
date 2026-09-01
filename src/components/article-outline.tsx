@@ -3,13 +3,14 @@ import type { Heading } from "@/lib/headings";
 
 export function ArticleLearnOutline({ headings }: { headings: Heading[] }) {
   const h2Items = headings.filter((h) => h.level === 2).slice(0, 6);
-  if (h2Items.length < 3) return null;
+  const items = h2Items.length >= 3 ? h2Items : headings.filter((h) => h.level === 3).slice(0, 6);
+  if (items.length < 3) return null;
 
   return (
     <section className="article-learn-outline mb-8 rounded-2xl border border-border/70 bg-muted/15 p-5 sm:p-6" aria-label="آنچه در این راهنما می‌خوانید">
       <h2 className="text-base font-bold tracking-tight sm:text-lg">در این راهنما می‌خوانید</h2>
       <ul className="mt-4 space-y-2.5">
-        {h2Items.map((item) => (
+        {items.map((item) => (
           <li key={item.id} className="flex items-start gap-2.5 text-sm leading-7 text-muted-foreground">
             <CheckCircle2 className="mt-1 h-4 w-4 shrink-0 text-primary" aria-hidden />
             <a href={`#${item.id}`} className="transition-colors hover:text-foreground">

@@ -87,10 +87,15 @@ function createHeadingComponent(
   };
 }
 
+function normalizeMarkdown(input: string): string {
+  return input.replace(/^\*\*\*\s*$/gm, "\n---\n");
+}
+
 export function MarkdownRenderer({ content, headings, coverImage }: Props) {
   const assignId = useHeadingIdAssigner();
   const headingIndexRef = React.useRef(0);
   const skippedCoverRef = React.useRef(false);
+  const markdown = React.useMemo(() => normalizeMarkdown(content), [content]);
 
   const components = React.useMemo(
     () => ({
@@ -143,21 +148,25 @@ export function MarkdownRenderer({ content, headings, coverImage }: Props) {
         children,
         ...props
       }: React.HTMLAttributes<HTMLElement>) => {
-        const text = String(children ?? "");
-        const match = /language-(\w+)/.exec(className ?? "");
-        if (!match) {
+        const text = String(children ?? "").replace(/\n$/, "");
+        const match = /language-([\w-]+)/.exec(className ?? "");
+        const language = match?.[1] ?? "text";
+        const isBlock = Boolean(match) || text.includes("\n");
+
+        if (isBlock) {
           return (
-            <code className={className} {...props}>
-              {children}
-            </code>
+            <CodeBlock
+              language={language}
+              code={text}
+              showLineNumbers={text.split("\n").length > 6}
+            />
           );
         }
+
         return (
-          <CodeBlock
-            language={match[1]}
-            code={text.replace(/\n$/, "")}
-            showLineNumbers={text.split("\n").length > 6}
-          />
+          <code className={className} {...props}>
+            {children}
+          </code>
         );
       },
       pre: ({ children }: { children?: React.ReactNode }) => <>{children}</>,
@@ -197,7 +206,7 @@ export function MarkdownRenderer({ content, headings, coverImage }: Props) {
   return (
     <div className="prose-article">
       <ReactMarkdown components={components} skipHtml>
-        {content}
+        {markdown}
       </ReactMarkdown>
     </div>
   );

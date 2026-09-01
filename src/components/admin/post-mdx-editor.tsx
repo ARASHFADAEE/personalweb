@@ -12,6 +12,8 @@ import {
   linkDialogPlugin,
   tablePlugin,
   codeBlockPlugin,
+  codeMirrorPlugin,
+  CodeMirrorEditor,
   markdownShortcutPlugin,
   toolbarPlugin,
   imagePlugin,
@@ -26,6 +28,8 @@ import {
   InsertImage,
   Separator,
   CodeToggle,
+  ConditionalContents,
+  ChangeCodeMirrorLanguage,
 } from "@mdxeditor/editor";
 import "@mdxeditor/editor/style.css";
 import { Button } from "@/components/ui/button";
@@ -49,6 +53,33 @@ async function uploadEditorImage(file: File): Promise<string> {
   }
   return data.urls[0];
 }
+
+const CODE_BLOCK_LANGUAGES = {
+  "": "Plain text",
+  text: "Plain text",
+  js: "JavaScript",
+  javascript: "JavaScript",
+  ts: "TypeScript",
+  tsx: "TypeScript (React)",
+  jsx: "JavaScript (React)",
+  css: "CSS",
+  html: "HTML",
+  json: "JSON",
+  bash: "Bash",
+  sh: "Shell",
+  shell: "Shell",
+  python: "Python",
+  py: "Python",
+  sql: "SQL",
+  md: "Markdown",
+  markdown: "Markdown",
+  yaml: "YAML",
+  yml: "YAML",
+  php: "PHP",
+  graphql: "GraphQL",
+  dockerfile: "Dockerfile",
+  prisma: "Prisma",
+} as const;
 
 type Props = {
   initialMarkdown: string;
@@ -81,26 +112,44 @@ export function PostMdxEditor({
         linkPlugin(),
         linkDialogPlugin(),
         tablePlugin(),
-        codeBlockPlugin({ defaultCodeBlockLanguage: "text" }),
+        codeBlockPlugin({
+          defaultCodeBlockLanguage: "text",
+          codeBlockEditorDescriptors: [
+            { priority: -10, match: () => true, Editor: CodeMirrorEditor },
+          ],
+        }),
+        codeMirrorPlugin({ codeBlockLanguages: CODE_BLOCK_LANGUAGES }),
         markdownShortcutPlugin(),
         imagePlugin({ imageUploadHandler: uploadEditorImage }),
         toolbarPlugin({
           toolbarContents: () => (
-            <>
-              <UndoRedo />
-              <Separator />
-              <BlockTypeSelect />
-              <BoldItalicUnderlineToggles />
-              <CodeToggle />
-              <Separator />
-              <ListsToggle />
-              <Separator />
-              <CreateLink />
-              <InsertImage />
-              <InsertTable />
-              <InsertThematicBreak />
-              <InsertCodeBlock />
-            </>
+            <ConditionalContents
+              options={[
+                {
+                  when: (editor) => editor?.editorType === "codeblock",
+                  contents: () => <ChangeCodeMirrorLanguage />,
+                },
+                {
+                  fallback: () => (
+                    <>
+                      <UndoRedo />
+                      <Separator />
+                      <BlockTypeSelect />
+                      <BoldItalicUnderlineToggles />
+                      <CodeToggle />
+                      <Separator />
+                      <ListsToggle />
+                      <Separator />
+                      <CreateLink />
+                      <InsertImage />
+                      <InsertTable />
+                      <InsertThematicBreak />
+                      <InsertCodeBlock />
+                    </>
+                  ),
+                },
+              ]}
+            />
           ),
         }),
       ]}

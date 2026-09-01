@@ -2,10 +2,18 @@ import { db } from "@/lib/db";
 import { Prisma } from "@prisma/client";
 
 /** Published posts visible on the public site (includes legacy rows with null publishedAt). */
-function publishedWhere(now = new Date()): Prisma.PostWhereInput {
+export function publishedWhere(now = new Date()): Prisma.PostWhereInput {
   return {
     status: "PUBLISHED",
     OR: [{ publishedAt: null }, { publishedAt: { lte: now } }],
+  };
+}
+
+/** For sitemap/RSS — published and indexable. */
+export function publishedIndexableWhere(now = new Date()): Prisma.PostWhereInput {
+  return {
+    ...publishedWhere(now),
+    robotsNoindex: false,
   };
 }
 
