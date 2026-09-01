@@ -154,7 +154,7 @@ export function PostMdxEditor({
         }),
       ]}
       placeholder="شروع به نوشتن کنید… (Markdown پشتیبانی می‌شود)"
-      contentEditableClassName="prose-article min-h-[420px] p-5 text-right"
+      contentEditableClassName="prose-article min-h-[420px] p-5 text-right text-foreground caret-foreground"
     />
   );
 }

@@ -860,11 +860,27 @@
   .admin-mdx-editor [contenteditable="true"] {
     direction: rtl;
     text-align: right;
+    color: var(--foreground);
+    caret-color: var(--foreground);
   }
 
   .admin-mdx-editor .prose-article {
     direction: rtl;
     text-align: right;
+    color: var(--foreground);
+  }
+
+  .admin-mdx-editor .prose-article p,
+  .admin-mdx-editor .prose-article li,
+  .admin-mdx-editor .prose-article blockquote,
+  .admin-mdx-editor .prose-article h1,
+  .admin-mdx-editor .prose-article h2,
+  .admin-mdx-editor .prose-article h3,
+  .admin-mdx-editor .prose-article h4,
+  .admin-mdx-editor .prose-article h5,
+  .admin-mdx-editor .prose-article h6,
+  .admin-mdx-editor .prose-article span[data-lexical-text="true"] {
+    color: inherit;
   }
 
   .admin-mdx-editor pre,
@@ -872,6 +888,54 @@
   .admin-mdx-editor [class*="code-block"] {
     direction: ltr;
     text-align: left;
+  }
+
+  /* MDXEditor dark mode — fix hardcoded light theme tokens */
+  .dark .admin-mdx-editor .mdxeditor {
+    --basePageBg: var(--card);
+    --baseBase: var(--background);
+    --baseBgSubtle: var(--muted);
+    --baseBg: var(--secondary);
+    --baseBgHover: var(--accent);
+    --baseBgActive: var(--muted);
+    --baseLine: var(--border);
+    --baseBorder: var(--border);
+    --baseBorderHover: var(--ring);
+    --baseSolid: var(--muted-foreground);
+    --baseSolidHover: var(--foreground);
+    --baseText: var(--muted-foreground);
+    --baseTextContrast: var(--foreground);
+    color: var(--foreground);
+    background-color: var(--card);
+  }
+
+  .dark .admin-mdx-editor .mdxeditor-root-contenteditable,
+  .dark .admin-mdx-editor [contenteditable="true"],
+  .dark .admin-mdx-editor .prose-article {
+    color: var(--foreground);
+    background-color: var(--card);
+    caret-color: var(--foreground);
+  }
+
+  .dark .admin-mdx-editor [class*="placeholder"] {
+    color: var(--muted-foreground);
+  }
+
+  .dark .admin-mdx-editor .cm-editor,
+  .dark .admin-mdx-editor .cm-content,
+  .dark .admin-mdx-editor .cm-line {
+    color: var(--foreground);
+    background-color: oklch(0.16 0.014 260);
+  }
+
+  .dark .admin-mdx-editor .cm-gutters {
+    background-color: oklch(0.14 0.014 260);
+    color: var(--muted-foreground);
+    border-color: var(--border);
+  }
+
+  .dark .admin-mdx-editor .cm-activeLine {
+    background-color: oklch(1 0 0 / 4%);
   }
 
   .admin-panel .ltr-field {
