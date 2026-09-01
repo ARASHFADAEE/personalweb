@@ -878,6 +878,29 @@
     direction: ltr;
     text-align: left;
   }
+
+  .admin-dashboard-item {
+    animation: blog-fade-up 0.55s ease both;
+  }
+
+  .admin-dashboard-hero {
+    animation: blog-fade-up 0.65s ease both;
+  }
+
+  .admin-dashboard-chart {
+    animation: admin-chart-in 0.8s ease 0.35s both;
+  }
+}
+
+@keyframes admin-chart-in {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 /* =========================================================================
@@ -917,7 +940,10 @@
   .blog-bento-item,
   .blog-card-enter,
   .blog-hero-panel,
-  .blog-empty {
+  .blog-empty,
+  .admin-dashboard-item,
+  .admin-dashboard-hero,
+  .admin-dashboard-chart {
     animation: none;
   }
 }

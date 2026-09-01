@@ -27,7 +27,7 @@ export function DashboardChart({ data }: { data: DataPoint[] }) {
   );
 
   return (
-    <div className="h-56 w-full" dir="ltr">
+    <div className="admin-dashboard-chart h-56 w-full" dir="ltr">
       <ResponsiveContainer width="100%" height="100%">
         <AreaChart data={formatted} margin={{ top: 5, right: 10, left: 0, bottom: 0 }}>
           <defs>
