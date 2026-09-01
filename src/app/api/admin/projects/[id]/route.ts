@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/lib/db";
 import { getSessionUser } from "@/lib/auth";
 import { slugify } from "@/lib/slug";
+import { revalidateProjectPages } from "@/lib/revalidate-public";
 
 export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   const user = await getSessionUser();
@@ -27,6 +28,7 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: 
   if (Array.isArray(body.technologies)) data.technologies = JSON.stringify(body.technologies.filter((t: any): t is string => typeof t === "string"));
 
   const project = await db.project.update({ where: { id }, data });
+  revalidateProjectPages(project.slug);
   return NextResponse.json({ project });
 }
 
@@ -34,6 +36,8 @@ export async function DELETE(_req: NextRequest, { params }: { params: Promise<{ 
   const user = await getSessionUser();
   if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   const { id } = await params;
+  const existing = await db.project.findUnique({ where: { id }, select: { slug: true } });
   await db.project.delete({ where: { id } }).catch(() => {});
+  revalidateProjectPages(existing?.slug);
   return NextResponse.json({ ok: true });
 }

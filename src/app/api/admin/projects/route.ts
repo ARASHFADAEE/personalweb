@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/lib/db";
 import { getSessionUser } from "@/lib/auth";
 import { slugify } from "@/lib/slug";
+import { revalidateProjectPages } from "@/lib/revalidate-public";
 
 export async function GET() {
   const user = await getSessionUser();
@@ -39,5 +40,6 @@ export async function POST(req: NextRequest) {
       sortOrder: Number(body.sortOrder ?? 0),
     },
   });
+  revalidateProjectPages(project.slug);
   return NextResponse.json({ project });
 }

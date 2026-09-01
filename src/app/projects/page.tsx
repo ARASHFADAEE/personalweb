@@ -27,7 +27,7 @@ export const metadata: Metadata = {
   alternates: { canonical: "/projects" },
 };
 
-export const revalidate = 600;
+export const revalidate = 60;
 
 export default async function ProjectsPage() {
   const [settings, projects] = await Promise.all([
