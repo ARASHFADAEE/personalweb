@@ -29,6 +29,8 @@ Vercel متغیرهای `arsh_*` را می‌سازد؛ Prisma به نام‌ه�
 
 بعد از اولین deploy موفق، دیتابیس را seed کن:
 
+> **توجه:** `prisma db push` فقط هنگام تغییر schema و به‌صورت دستی (`npm run db:push`) اجرا شود — در build روی Vercel اجرا نمی‌شود تا خطای `too many connections` رخ ندهد.
+
 ```bash
 # با connection string مستقیم از Vercel
 DIRECT_URL="..." DATABASE_URL="..." npm run db:seed
