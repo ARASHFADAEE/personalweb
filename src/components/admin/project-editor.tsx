@@ -13,6 +13,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { useToast } from "@/hooks/use-toast";
 import { slugify } from "@/lib/slug";
 import { MediaPickerButton } from "@/components/admin/media-picker-button";
+import { PublishSuccessModal } from "@/components/admin/publish-success-modal";
 
 type ProjectData = {
   id?: string; title: string; slug: string; description: string; content: string;
@@ -29,6 +30,8 @@ export function ProjectEditor({ initial }: { initial: ProjectData | null }) {
   });
   const [techInput, setTechInput] = React.useState("");
   const [saving, setSaving] = React.useState(false);
+  const [publishSuccessOpen, setPublishSuccessOpen] = React.useState(false);
+  const pendingRedirectRef = React.useRef<string | null>(null);
 
   const update = (patch: Partial<ProjectData>) => setData((p) => ({ ...p, ...patch }));
 
@@ -53,10 +56,48 @@ export function ProjectEditor({ initial }: { initial: ProjectData | null }) {
       const method = data.id ? "PUT" : "POST";
       const res = await fetch(url, { method, headers: { "Content-Type": "application/json" }, body: JSON.stringify(payload) });
       const result = await res.json();
-      if (!res.ok) { toast({ variant: "destructive", title: result.error ?? "خطا" }); return; }
-      toast({ title: "ذخیره شد" });
-      if (!data.id && result.project?.id) router.push(`/admin/projects/${result.project.id}/edit`);
-    } finally { setSaving(false); }
+      if (!res.ok) {
+        toast({ variant: "destructive", title: result.error ?? "خطا" });
+        return;
+      }
+
+      const saved = result.project;
+      const isPublish = status === "PUBLISHED";
+
+      if (isPublish) {
+        pendingRedirectRef.current =
+          !data.id && saved?.id ? `/admin/projects/${saved.id}/edit` : null;
+        setPublishSuccessOpen(true);
+      } else {
+        toast({ title: "ذخیره شد" });
+      }
+
+      if (saved) {
+        setData((prev) => ({
+          ...prev,
+          id: saved.id ?? prev.id,
+          slug: saved.slug ?? prev.slug,
+          status: isPublish ? "PUBLISHED" : prev.status,
+        }));
+      } else if (isPublish) {
+        update({ status: "PUBLISHED" });
+      }
+
+      if (!isPublish && !data.id && saved?.id) {
+        router.push(`/admin/projects/${saved.id}/edit`);
+      }
+    } catch {
+      toast({ variant: "destructive", title: "خطای شبکه" });
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const handlePublishSuccessClose = () => {
+    setPublishSuccessOpen(false);
+    const redirect = pendingRedirectRef.current;
+    pendingRedirectRef.current = null;
+    if (redirect) router.push(redirect);
   };
 
   const remove = async () => {
@@ -174,6 +215,14 @@ export function ProjectEditor({ initial }: { initial: ProjectData | null }) {
           </div>
         </aside>
       </div>
+
+      <PublishSuccessModal
+        open={publishSuccessOpen}
+        onClose={handlePublishSuccessClose}
+        title="پروژه منتشر شد!"
+        description="پروژه با موفقیت منتشر شد و اکنون در سایت قابل مشاهده است."
+        duration={5}
+      />
     </div>
   );
 }
