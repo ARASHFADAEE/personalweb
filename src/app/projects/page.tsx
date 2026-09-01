@@ -50,7 +50,7 @@ export default async function ProjectsPage() {
                   : [];
                 return (
                   <article key={proj.id} className="group flex flex-col overflow-hidden rounded-xl border border-border bg-card transition-all hover:border-primary/40 hover:shadow-sm">
-                    <Link href={`/projects/${proj.slug}`} className="block aspect-[16/9] overflow-hidden bg-muted">
+                    <Link href={`/projects/${proj.slug}`} className="relative block aspect-[16/9] overflow-hidden bg-muted">
                       {proj.coverImage ? (
                         <Image src={proj.coverImage} alt={proj.title} fill sizes="(max-width: 768px) 100vw, 50vw" className="object-cover transition-transform duration-500 group-hover:scale-[1.03]" />
                       ) : (

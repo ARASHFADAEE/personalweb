@@ -82,7 +82,7 @@ export function ProjectEditor({ initial }: { initial: ProjectData | null }) {
         </div>
       </div>
 
-      <div className="grid gap-4 lg:grid-cols-[1fr,280px]">
+      <div className="grid gap-4 lg:grid-cols-[1fr_280px]">
         <div className="space-y-4">
           <div>
             <Label htmlFor="title">عنوان</Label>
@@ -90,9 +90,9 @@ export function ProjectEditor({ initial }: { initial: ProjectData | null }) {
           </div>
           <div>
             <Label htmlFor="slug">نشانک</Label>
-            <div className="mt-1.5 flex items-center gap-2">
-              <span className="font-mono text-sm text-muted-foreground">/projects/</span>
-              <Input id="slug" dir="ltr" value={data.slug} onChange={(e) => update({ slug: slugify(e.target.value) })} className="font-mono text-left" />
+            <div className="ltr-field mt-1.5 flex items-center gap-2 rounded-md border border-input bg-background px-3 py-1">
+              <span className="shrink-0 font-mono text-sm text-muted-foreground">/projects/</span>
+              <Input id="slug" dir="ltr" value={data.slug} onChange={(e) => update({ slug: slugify(e.target.value) })} className="border-0 bg-transparent px-0 font-mono shadow-none focus-visible:ring-0" />
             </div>
           </div>
           <div>
@@ -101,7 +101,7 @@ export function ProjectEditor({ initial }: { initial: ProjectData | null }) {
           </div>
           <div>
             <Label htmlFor="content">محتوای کامل (Markdown)</Label>
-            <Textarea id="content" value={data.content} onChange={(e) => update({ content: e.target.value })} rows={10} className="mt-1.5 font-mono text-sm text-left" dir="ltr" />
+            <Textarea id="content" value={data.content} onChange={(e) => update({ content: e.target.value })} rows={12} className="mt-1.5 font-mono text-sm" dir="rtl" />
           </div>
         </div>
 

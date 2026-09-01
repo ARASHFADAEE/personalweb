@@ -9,6 +9,7 @@ import {
   FolderTree,
   Hash,
   Image as ImageIcon,
+  MessageSquare,
   FolderGit2,
   Settings,
   LogOut,
@@ -23,6 +24,7 @@ import type { Settings as SiteSettings } from "@/lib/data/settings";
 const NAV = [
   { href: "/admin", label: "داشبورد", icon: LayoutDashboard, exact: true },
   { href: "/admin/posts", label: "مقالات", icon: FileText },
+  { href: "/admin/comments", label: "نظرات", icon: MessageSquare },
   { href: "/admin/categories", label: "دسته‌بندی‌ها", icon: FolderTree },
   { href: "/admin/tags", label: "تگ‌ها", icon: Hash },
   { href: "/admin/media", label: "رسانه‌ها", icon: ImageIcon },
@@ -34,6 +36,12 @@ export function AdminSidebar({ settings }: { settings: SiteSettings }) {
   const pathname = usePathname();
   const [open, setOpen] = React.useState(false);
   const { signOut } = useAuth();
+
+  React.useEffect(() => {
+    const onToggle = () => setOpen((v) => !v);
+    document.addEventListener("toggle-admin-sidebar", onToggle);
+    return () => document.removeEventListener("toggle-admin-sidebar", onToggle);
+  }, []);
 
   const isActive = (href: string, exact?: boolean) =>
     exact ? pathname === href : pathname.startsWith(href);

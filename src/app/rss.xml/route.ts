@@ -1,14 +1,19 @@
 import { db } from "@/lib/db";
 import { getSettings } from "@/lib/data/settings";
+import { getSiteUrl } from "@/lib/site-url";
 
-export const dynamic = "force-static";
+export const revalidate = 3600;
 
 export async function GET() {
-  const baseUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000";
+  const baseUrl = getSiteUrl();
   const settings = await getSettings();
 
   const posts = await db.post.findMany({
-    where: { status: "PUBLISHED" },
+    where: {
+      status: "PUBLISHED",
+      publishedAt: { lte: new Date() },
+      robotsNoindex: false,
+    },
     orderBy: { publishedAt: "desc" },
     take: 30,
     include: { category: true, author: { select: { name: true } } },

@@ -14,7 +14,7 @@ type Project = {
   id: string; title: string; slug: string; description: string;
   coverImage: string | null; technologies: string; demoUrl: string | null;
   repoUrl: string | null; featured: boolean; status: string;
-  sortOrder: number; createdAt: string;
+  sortOrder: number; createdAt: Date | string;
 };
 
 const STATUS_LABEL: Record<string, string> = { PUBLISHED: "منتشرشده", DRAFT: "پیش‌نویس", ARCHIVED: "بایگانی" };
@@ -68,7 +68,7 @@ export function ProjectsTable({ initial }: { initial: Project[] }) {
                     </div>
                   </TableCell>
                   <TableCell>
-                    <Badge variant="secondary" className={p.status === "PUBLISHED" ? "bg-emerald-500/10 text-emerald-600" : "bg-muted text-muted-foreground"}>
+                    <Badge variant="secondary" className={p.status === "PUBLISHED" ? "bg-primary/10 text-primary" : "bg-muted text-muted-foreground"}>
                       {STATUS_LABEL[p.status] ?? p.status}
                     </Badge>
                   </TableCell>

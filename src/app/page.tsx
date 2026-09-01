@@ -17,6 +17,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { formatJalali } from "@/lib/jalali";
 import { formatCount } from "@/lib/slug";
+import { HeroStatusBadge } from "@/components/hero-status-badge";
 
 export const revalidate = 3600; // revalidate homepage every hour
 
@@ -56,65 +57,96 @@ export default async function HomePage() {
           </div>
 
           <div className="container mx-auto px-4 py-16 lg:px-6 lg:py-24">
-            <div className="mx-auto max-w-3xl text-center">
-              <Badge variant="outline" className="mb-5 gap-1.5 bg-background/60 py-1 text-xs font-medium text-muted-foreground">
-                <Sparkles className="h-3.5 w-3.5 text-primary" />
-                توسعه‌دهنده فول‌استک · کانال تخصصی
-              </Badge>
-              <h1 className="text-balance text-4xl font-extrabold leading-[1.15] tracking-tight sm:text-5xl lg:text-6xl">
-                {settings.authorName}
-                <span className="block bg-gradient-to-l from-primary to-primary/70 bg-clip-text text-transparent">
-                  درباره‌ی کد و معماری می‌نویسم
-                </span>
-              </h1>
-              <p className="mx-auto mt-6 max-w-2xl text-balance text-lg leading-8 text-muted-foreground text-pretty">
-                {settings.authorBio}
-              </p>
+            <div className="grid items-center gap-10 lg:grid-cols-[1.2fr_0.8fr]">
+              <div className="mx-auto max-w-3xl text-center lg:mx-0 lg:text-right">
+                <Badge variant="outline" className="mb-5 gap-1.5 bg-background/60 py-1 text-xs font-medium text-muted-foreground">
+                  <Sparkles className="h-3.5 w-3.5 text-primary" />
+                  توسعه‌دهنده فول‌استک · کانال تخصصی
+                </Badge>
+                <h1 className="text-balance text-4xl font-extrabold leading-[1.15] tracking-tight sm:text-5xl lg:text-6xl">
+                  {settings.authorName}
+                  <span className="block bg-gradient-to-l from-primary via-primary to-primary/60 bg-clip-text text-transparent">
+                    درباره‌ی کد و معماری می‌نویسم
+                  </span>
+                </h1>
+                <p className="mx-auto mt-6 max-w-2xl text-balance text-lg leading-8 text-muted-foreground text-pretty lg:mx-0">
+                  {settings.authorBio}
+                </p>
 
-              <div className="mt-8 flex flex-wrap items-center justify-center gap-3">
-                <Button asChild size="lg" className="h-11 gap-2">
-                  <Link href="/blog">
-                    <BookOpen className="h-4 w-4" />
-                    خواندن مقالات
-                  </Link>
-                </Button>
-                <Button asChild size="lg" variant="outline" className="h-11 gap-2">
-                  <Link href="/projects">
-                    <FolderGit2 className="h-4 w-4" />
-                    دیدن پروژه‌ها
-                  </Link>
-                </Button>
+                <div className="mt-8 flex flex-wrap items-center justify-center gap-3 lg:justify-start">
+                  <Button asChild size="lg" className="h-11 gap-2">
+                    <Link href="/blog">
+                      <BookOpen className="h-4 w-4" />
+                      خواندن مقالات
+                    </Link>
+                  </Button>
+                  <Button asChild size="lg" variant="outline" className="h-11 gap-2">
+                    <Link href="/projects">
+                      <FolderGit2 className="h-4 w-4" />
+                      دیدن پروژه‌ها
+                    </Link>
+                  </Button>
+                </div>
+
+                <div className="mt-8 flex items-center justify-center gap-2 lg:justify-start">
+                  {settings.socialGithub && (
+                    <a href={settings.socialGithub} target="_blank" rel="noopener noreferrer" aria-label="گیت‌هاب"
+                       className="flex h-10 w-10 items-center justify-center rounded-lg border border-border text-muted-foreground transition-colors hover:bg-muted hover:text-foreground">
+                      <Github className="h-4.5 w-4.5" />
+                    </a>
+                  )}
+                  {settings.socialLinkedin && (
+                    <a href={settings.socialLinkedin} target="_blank" rel="noopener noreferrer" aria-label="لینکدین"
+                       className="flex h-10 w-10 items-center justify-center rounded-lg border border-border text-muted-foreground transition-colors hover:bg-muted hover:text-foreground">
+                      <Linkedin className="h-4.5 w-4.5" />
+                    </a>
+                  )}
+                  {settings.socialEmail && (
+                    <a href={`mailto:${settings.socialEmail}`} aria-label="ایمیل"
+                       className="flex h-10 w-10 items-center justify-center rounded-lg border border-border text-muted-foreground transition-colors hover:bg-muted hover:text-foreground">
+                      <Mail className="h-4.5 w-4.5" />
+                    </a>
+                  )}
+                </div>
+
+                <dl className="mx-auto mt-12 grid max-w-md grid-cols-3 gap-4 lg:mx-0">
+                  {stats.map((s) => (
+                    <div key={s.label} className="rounded-xl border border-border/70 bg-card/60 p-4 text-center">
+                      <dt className="text-xs text-muted-foreground">{s.label}</dt>
+                      <dd className="mt-1 font-mono text-2xl font-bold">{s.value}</dd>
+                    </div>
+                  ))}
+                </dl>
               </div>
 
-              <div className="mt-8 flex items-center justify-center gap-2">
-                {settings.socialGithub && (
-                  <a href={settings.socialGithub} target="_blank" rel="noopener noreferrer" aria-label="گیت‌هاب"
-                     className="flex h-10 w-10 items-center justify-center rounded-lg border border-border text-muted-foreground transition-colors hover:bg-muted hover:text-foreground">
-                    <Github className="h-4.5 w-4.5" />
-                  </a>
-                )}
-                {settings.socialLinkedin && (
-                  <a href={settings.socialLinkedin} target="_blank" rel="noopener noreferrer" aria-label="لینکدین"
-                     className="flex h-10 w-10 items-center justify-center rounded-lg border border-border text-muted-foreground transition-colors hover:bg-muted hover:text-foreground">
-                    <Linkedin className="h-4.5 w-4.5" />
-                  </a>
-                )}
-                {settings.socialEmail && (
-                  <a href={`mailto:${settings.socialEmail}`} aria-label="ایمیل"
-                     className="flex h-10 w-10 items-center justify-center rounded-lg border border-border text-muted-foreground transition-colors hover:bg-muted hover:text-foreground">
-                    <Mail className="h-4.5 w-4.5" />
-                  </a>
-                )}
-              </div>
+              <div className="relative mx-auto w-full max-w-md">
+                <div className="absolute inset-0 -z-10 rounded-[2rem] bg-[radial-gradient(circle_at_center,_rgba(124,29,29,0.28),_transparent_60%)] blur-2xl" />
+                <div className="relative overflow-hidden rounded-[2rem] border border-border/80 bg-gradient-to-br from-background via-card to-secondary/60 p-3 shadow-[0_30px_80px_rgba(0,0,0,0.18)] backdrop-blur-sm">
+                  <div className="relative overflow-hidden rounded-[1.5rem] border border-border/70 bg-[radial-gradient(circle_at_top,_rgba(124,29,29,0.25),_rgba(15,15,17,0.96)_52%,_rgba(4,4,5,1)_100%)] p-4">
+                    <div className="relative mx-auto aspect-[4/5] w-full max-w-[420px] overflow-hidden rounded-[1.35rem] border border-white/10 bg-[linear-gradient(135deg,rgba(17,17,19,1),rgba(27,14,14,0.9)_45%,rgba(7,7,8,1))]">
+                      <div className="absolute inset-x-8 top-0 h-20 rounded-b-[50%] bg-primary/20 blur-3xl" />
+                      <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_15%,rgba(255,255,255,0.2),transparent_20%),linear-gradient(180deg,rgba(0,0,0,0)_20%,rgba(0,0,0,0.35)_100%)]" />
 
-              <dl className="mx-auto mt-12 grid max-w-md grid-cols-3 gap-4">
-                {stats.map((s) => (
-                  <div key={s.label} className="rounded-xl border border-border/70 bg-card/60 p-4 text-center">
-                    <dt className="text-xs text-muted-foreground">{s.label}</dt>
-                    <dd className="mt-1 font-mono text-2xl font-bold">{s.value}</dd>
+                      <div className="absolute inset-0">
+                        <Image
+                          src="/img/1405-06-10 18.10.56.jpg"
+                          alt={settings.authorName}
+                          fill
+                          priority
+                          className="object-cover object-center grayscale contrast-125 brightness-[0.72]"
+                          sizes="(max-width: 768px) 100vw, 420px"
+                        />
+                      </div>
+
+                      <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(7,7,8,0)_34%,rgba(7,7,8,0.42)_68%,rgba(7,7,8,0.8)_100%)]" />
+
+                      <div className="absolute inset-x-0 bottom-8 text-center">
+                        <HeroStatusBadge />
+                      </div>
+                    </div>
                   </div>
-                ))}
-              </dl>
+                </div>
+              </div>
             </div>
           </div>
         </section>
@@ -207,7 +239,7 @@ export default async function HomePage() {
                   : [];
                 return (
                   <article key={proj.id} className="group flex flex-col overflow-hidden rounded-xl border border-border bg-card transition-all hover:border-primary/40 hover:shadow-sm">
-                    <Link href={`/projects/${proj.slug}`} className="block aspect-[16/9] overflow-hidden bg-muted">
+                    <Link href={`/projects/${proj.slug}`} className="relative block aspect-[16/9] overflow-hidden bg-muted">
                       {proj.coverImage ? (
                         <Image src={proj.coverImage} alt={proj.title} fill sizes="(max-width: 768px) 100vw, 50vw" className="object-cover transition-transform duration-500 group-hover:scale-[1.03]" />
                       ) : (

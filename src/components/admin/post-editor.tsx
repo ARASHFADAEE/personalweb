@@ -3,32 +3,7 @@
 import * as React from "react";
 import { useRouter } from "next/navigation";
 import {
-  MDXEditor,
-  type MDXEditorMethods,
-  headingsPlugin,
-  listsPlugin,
-  quotePlugin,
-  thematicBreakPlugin,
-  linkPlugin,
-  linkDialogPlugin,
-  tablePlugin,
-  codeBlockPlugin,
-  codeBlockSelectors,
-  markdownShortcutPlugin,
-  toolbarPlugin,
-  imagePlugin,
-  frontmatterPlugin,
-  UndoRedo,
-  BoldItalicUnderlineToggles,
-  BlockTypeSelect,
-  ListsToggle,
-  CreateLink,
-  InsertThematicBreak,
-  InsertTable,
-  InsertCodeBlock,
-  InsertImage,
-  Separator,
-  CodeToggle,
+  MDXEditorMethods,
 } from "@mdxeditor/editor";
 import "@mdxeditor/editor/style.css";
 import { Loader2, Save, Eye, Send, Trash2, ImagePlus, Search } from "lucide-react";
@@ -57,6 +32,11 @@ import { useToast } from "@/hooks/use-toast";
 import { slugify, toPersianDigits } from "@/lib/slug";
 import { GooglePreview } from "@/components/admin/google-preview";
 import { MediaPickerButton } from "@/components/admin/media-picker-button";
+import {
+  MdxEditorErrorBoundary,
+  PostMdxEditor,
+  sanitizeEditorMarkdown,
+} from "@/components/admin/post-mdx-editor";
 
 type Category = { id: string; name: string; slug: string };
 type Tag = { id: string; name: string; slug: string };
@@ -96,6 +76,8 @@ export function PostEditor({
   const router = useRouter();
   const { toast } = useToast();
   const mdxRef = React.useRef<MDXEditorMethods>(null);
+  const contentRef = React.useRef(sanitizeEditorMarkdown(initial?.content ?? ""));
+  const [editorSession, setEditorSession] = React.useState(0);
 
   const [data, setData] = React.useState<PostData>(
     initial ?? {
@@ -115,13 +97,34 @@ export function PostEditor({
       ogTitle: "",
       ogDescription: "",
       ogImage: "",
-      focusKeyword: string(""),
+      focusKeyword: "",
       robotsNoindex: false,
       robotsNofollow: false,
     }
   );
   const [saving, setSaving] = React.useState(false);
   const [activeTab, setActiveTab] = React.useState("content");
+  const [contentStats, setContentStats] = React.useState(() => {
+    const words = contentRef.current.split(/\s+/).filter(Boolean).length;
+    return { words, readingTime: Math.max(1, Math.ceil(words / 200)) };
+  });
+
+  const handleContentChange = React.useCallback((md: string) => {
+    contentRef.current = md;
+    const words = md.split(/\s+/).filter(Boolean).length;
+    setContentStats({
+      words,
+      readingTime: Math.max(1, Math.ceil(words / 200)),
+    });
+  }, []);
+
+  const getEditorMarkdown = React.useCallback(() => {
+    const live = mdxRef.current?.getMarkdown();
+    if (typeof live === "string") {
+      return sanitizeEditorMarkdown(live);
+    }
+    return contentRef.current;
+  }, []);
 
   const update = (patch: Partial<PostData>) => setData((prev) => ({ ...prev, ...patch }));
 
@@ -141,7 +144,7 @@ export function PostEditor({
       toast({ variant: "destructive", title: "عنوان الزامی است" });
       return;
     }
-    const content = mdxRef.current?.getMarkdown() ?? data.content;
+    const content = getEditorMarkdown();
     setSaving(true);
     const payload = { ...data, content, ...(overrideStatus ? { status: overrideStatus } : {}) };
     try {
@@ -178,7 +181,8 @@ export function PostEditor({
     router.refresh();
   };
 
-  const readingTime = Math.max(1, Math.ceil((mdxRef.current?.getMarkdown() ?? data.content).split(/\s+/).filter(Boolean).length / 200));
+  const readingTime = contentStats.readingTime;
+  const editorKey = `${data.id ?? "new"}-${editorSession}`;
 
   return (
     <div className="space-y-5">
@@ -217,8 +221,8 @@ export function PostEditor({
 
         {/* CONTENT TAB */}
         <TabsContent value="content" className="space-y-4">
-          <div className="grid gap-4 lg:grid-cols-[1fr,280px]">
-            <div className="space-y-4">
+          <div className="grid gap-4 lg:grid-cols-[1fr_280px]">
+            <div className="space-y-4 order-1 lg:order-none">
               <div>
                 <Label htmlFor="title">عنوان</Label>
                 <Input
@@ -231,15 +235,15 @@ export function PostEditor({
               </div>
               <div>
                 <Label htmlFor="slug">نشانک (URL)</Label>
-                <div className="mt-1.5 flex items-center gap-2">
-                  <span className="font-mono text-sm text-muted-foreground">/blog/</span>
+                <div className="ltr-field mt-1.5 flex items-center gap-2 rounded-md border border-input bg-background px-3 py-1">
+                  <span className="shrink-0 font-mono text-sm text-muted-foreground">/blog/</span>
                   <Input
                     id="slug"
                     dir="ltr"
                     value={data.slug}
                     onChange={(e) => update({ slug: slugify(e.target.value) })}
                     placeholder="my-article"
-                    className="font-mono text-left"
+                    className="border-0 bg-transparent px-0 font-mono shadow-none focus-visible:ring-0"
                   />
                 </div>
               </div>
@@ -258,52 +262,21 @@ export function PostEditor({
 
               <div>
                 <Label>محتوا</Label>
-                <div className="mt-1.5 overflow-hidden rounded-xl border border-border">
-                  <MDXEditor
-                    ref={mdxRef}
-                    markdown={data.content || ""}
-                    onChange={(md) => update({ content: md })}
-                    plugins={[
-                      headingsPlugin(),
-                      listsPlugin(),
-                      quotePlugin(),
-                      thematicBreakPlugin(),
-                      linkPlugin(),
-                      linkDialogPlugin(),
-                      tablePlugin(),
-                      codeBlockPlugin({ defaultCodeBlockLanguage: "ts", codeBlockEditorDescriptors: codeBlockSelectors }),
-                      markdownShortcutPlugin(),
-                      imagePlugin({ imageUploadHandler: async () => "" }),
-                      frontmatterPlugin(),
-                      toolbarPlugin({
-                        toolbarContents: () => (
-                          <>
-                            <UndoRedo />
-                            <Separator />
-                            <BlockTypeSelect />
-                            <BoldItalicUnderlineToggles />
-                            <CodeToggle />
-                            <Separator />
-                            <ListsToggle />
-                            <Separator />
-                            <CreateLink />
-                            <InsertImage />
-                            <InsertTable />
-                            <InsertThematicBreak />
-                            <InsertCodeBlock />
-                          </>
-                        ),
-                      }),
-                    ]}
-                    placeholder="شروع به نوشتن کنید… (Markdown پشتیبانی می‌شود)"
-                    contentEditableClassName="prose-article min-h-[400px] p-5"
-                  />
+                <div className="admin-mdx-editor mt-1.5 overflow-hidden rounded-xl border border-border" dir="rtl">
+                  <MdxEditorErrorBoundary onRetry={() => setEditorSession((n) => n + 1)}>
+                    <PostMdxEditor
+                      editorKey={editorKey}
+                      editorRef={mdxRef}
+                      initialMarkdown={contentRef.current}
+                      onMarkdownChange={handleContentChange}
+                    />
+                  </MdxEditorErrorBoundary>
                 </div>
               </div>
             </div>
 
-            {/* Sidebar */}
-            <aside className="space-y-4">
+            {/* Sidebar — publish settings */}
+            <aside className="order-2 space-y-4 lg:order-none">
               <div className="rounded-xl border border-border bg-card p-4">
                 <Label>وضعیت</Label>
                 <Select value={data.status} onValueChange={(v) => update({ status: v })}>
@@ -362,7 +335,7 @@ export function PostEditor({
                     <img src={data.coverImage} alt="cover" className="h-full w-full object-cover" />
                     <button
                       onClick={() => update({ coverImage: "" })}
-                      className="absolute left-2 top-2 rounded-md bg-black/60 px-2 py-1 text-xs text-white hover:bg-black/80"
+                      className="absolute start-2 top-2 rounded-md bg-black/60 px-2 py-1 text-xs text-white hover:bg-black/80"
                     >
                       حذف
                     </button>
@@ -413,7 +386,7 @@ export function PostEditor({
             <div className="rounded-xl border border-border bg-card p-4 space-y-3">
               <h3 className="text-sm font-semibold">خلاصه و خوانش</h3>
               <p className="text-xs text-muted-foreground">
-                تعداد کلمات: {toPersianDigits((mdxRef.current?.getMarkdown() ?? data.content).split(/\s+/).filter(Boolean).length)}
+                تعداد کلمات: {toPersianDigits(contentStats.words)}
               </p>
               <p className="text-xs text-muted-foreground">
                 زمان مطالعه تقریبی: {toPersianDigits(readingTime)} دقیقه
@@ -516,7 +489,7 @@ function SeoChecklist({ data }: { data: PostData }) {
     <ul className="space-y-1.5 text-sm">
       {items.map((it) => (
         <li key={it.label} className="flex items-center gap-2">
-          <span className={`h-2 w-2 rounded-full ${it.ok ? "bg-emerald-500" : "bg-muted-foreground/40"}`} />
+          <span className={`h-2 w-2 rounded-full ${it.ok ? "bg-primary" : "bg-muted-foreground/40"}`} />
           <span className={it.ok ? "" : "text-muted-foreground"}>{it.label}</span>
         </li>
       ))}

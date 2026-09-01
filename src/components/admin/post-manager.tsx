@@ -57,8 +57,8 @@ type Post = {
   status: string;
   featured: boolean;
   viewsCount: number;
-  createdAt: string;
-  publishedAt: string | null;
+  createdAt: Date | string;
+  publishedAt: Date | string | null;
   category: { id: string; name: string; slug: string } | null;
   tags: { tag: { id: string; name: string } }[];
 };
@@ -70,7 +70,7 @@ const STATUS_LABEL: Record<string, string> = {
 };
 
 const STATUS_COLOR: Record<string, string> = {
-  PUBLISHED: "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400",
+  PUBLISHED: "bg-primary/10 text-primary",
   DRAFT: "bg-muted text-muted-foreground",
   SCHEDULED: "bg-amber-500/10 text-amber-600 dark:text-amber-400",
 };
@@ -165,7 +165,7 @@ export function PostManager({
           </div>
           <Select value={statusFilter} onValueChange={setStatusFilter}>
             <SelectTrigger className="h-10 w-full sm:w-44">
-              <Filter className="ml-2 h-4 w-4" />
+              <Filter className="ms-2 h-4 w-4" />
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
@@ -259,13 +259,13 @@ export function PostManager({
                         <DropdownMenuContent align="end" className="min-w-44">
                           <DropdownMenuItem asChild>
                             <Link href={`/admin/posts/${p.id}/edit`}>
-                              <Edit className="ml-2 h-4 w-4" /> ویرایش
+                              <Edit className="ms-2 h-4 w-4" /> ویرایش
                             </Link>
                           </DropdownMenuItem>
                           {p.status === "PUBLISHED" && (
                             <DropdownMenuItem asChild>
                               <Link href={`/blog/${p.slug}`} target="_blank">
-                                <ExternalLink className="ml-2 h-4 w-4" /> مشاهده
+                                <ExternalLink className="ms-2 h-4 w-4" /> مشاهده
                               </Link>
                             </DropdownMenuItem>
                           )}
@@ -273,7 +273,7 @@ export function PostManager({
                             onClick={() => deleteOne(p.id)}
                             className="text-destructive focus:text-destructive"
                           >
-                            <Trash2 className="ml-2 h-4 w-4" /> حذف
+                            <Trash2 className="ms-2 h-4 w-4" /> حذف
                           </DropdownMenuItem>
                         </DropdownMenuContent>
                       </DropdownMenu>

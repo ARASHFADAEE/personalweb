@@ -32,7 +32,7 @@ export async function listPublishedPosts(opts: {
       { excerpt: { contains: q } },
       { content: { contains: q } },
       { focusKeyword: { contains: q } },
-      { tags: { some: { tag: { name: { contains: q } } } },
+      { tags: { some: { tag: { name: { contains: q } } } } },
       { category: { name: { contains: q } } },
     ];
   }
@@ -173,7 +173,7 @@ export async function searchPosts(q: string, limit = 8) {
       OR: [
         { title: { contains: query } },
         { excerpt: { contains: query } },
-        { tags: { some: { tag: { name: { contains: query } } } },
+        { tags: { some: { tag: { name: { contains: query } } } } },
         { category: { name: { contains: query } } },
       ],
     },

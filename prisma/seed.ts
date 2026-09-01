@@ -24,16 +24,23 @@ async function main() {
 
   // ---- User / Admin ----
   const passwordHash = await bcrypt.hash("admin12345", 12);
-  const admin = await prisma.user.create({
-    data: {
-      email: "admin@devnet.local",
-      name: "آرین رضایی",
+  const admin = await prisma.user.upsert({
+    where: { email: "admin@devnet.local" },
+    update: {
+      name: "آرش فدایی",
       passwordHash,
       role: "ADMIN",
-      bio: "Full-Stack Developer، عاشق Next.js و معماری نرم‌افزار.",
+      bio: "توسعه‌دهنده ارشد وب و متخصص PHP",
+    },
+    create: {
+      email: "admin@devnet.local",
+      name: "آرش فدایی",
+      passwordHash,
+      role: "ADMIN",
+      bio: "توسعه‌دهنده ارشد وب و متخصص PHP",
     },
   });
-  console.log("✓ Admin user created (admin@devnet.local / admin12345)");
+  console.log(`✓ Admin user ready (admin@devnet.local / admin12345) [id=${admin.id}]`);
 
   // ---- Categories ----
   const categories = await Promise.all([
@@ -284,7 +291,7 @@ for await (const chunk of stream) {
       tagSlugs: ["typescript", "security"],
       featured: false,
       publishedAtDaysAgo: 25,
-      coverImage: "https://images.unsplash.com/photo-1486312338219-ce68d2c6f049?w=1200&q=80",
+      coverImage: "https://images.unsplash.com/photo-1517694712202-14dd9538aa43?w=1200&q=80",
       content: `## مقدمه
 
 SOLID پنج اصل طراحی است که کد ما را قابل‌تغییر و قابل‌تست می‌کند.
@@ -528,7 +535,7 @@ fetch(url, { next: { revalidate: 3600 } });
     data: [
       { key: "siteName", value: "دِو‌نت" },
       { key: "logoText", value: "dev.net" },
-      { key: "authorName", value: "آرین رضایی" },
+      { key: "authorName", value: "آرش فدایی" },
       { key: "newsletterEnabled", value: "true" },
     ],
   });

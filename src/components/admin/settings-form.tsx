@@ -53,7 +53,10 @@ export function SettingsForm({ initial }: { initial: Settings }) {
 
         <TabsContent value="author" className="space-y-4">
           <Card>
-            <Field label="نام نویسنده"><Input value={data.authorName} onChange={(e) => update({ authorName: e.target.value })} /></Field>
+            <p className="text-sm text-muted-foreground">
+              نام و اطلاعات نویسنده در صفحه اصلی، درباره‌ی من، فوتر و متادیتای مقالات نمایش داده می‌شود.
+            </p>
+            <Field label="نام نویسنده"><Input value={data.authorName} onChange={(e) => update({ authorName: e.target.value })} placeholder="مثلاً آرش فدایی" /></Field>
             <Field label="بیوگرافی"><Textarea value={data.authorBio} onChange={(e) => update({ authorBio: e.target.value })} rows={4} /></Field>
             <Field label="آواتار (URL)"><Input dir="ltr" value={data.authorAvatar} onChange={(e) => update({ authorAvatar: e.target.value })} className="text-left" placeholder="https://…" /></Field>
             <div className="grid gap-4 sm:grid-cols-2 pt-2">

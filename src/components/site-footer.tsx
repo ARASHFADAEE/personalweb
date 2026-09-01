@@ -1,9 +1,12 @@
 import Link from "next/link";
 import { Github, Linkedin, Mail, Twitter } from "lucide-react";
 import { Settings } from "@/lib/data/settings";
+import { listCategoriesWithCount } from "@/lib/data/posts";
 
-export function SiteFooter({ settings }: { settings: Settings }) {
+export async function SiteFooter({ settings }: { settings: Settings }) {
   const year = new Date().getFullYear();
+  const categories = (await listCategoriesWithCount()).filter((c) => c.postsCount > 0);
+
   return (
     <footer className="mt-auto border-t border-border/70 bg-muted/30">
       <div className="container mx-auto px-4 py-10 lg:px-6">
@@ -79,12 +82,27 @@ export function SiteFooter({ settings }: { settings: Settings }) {
 
           <div className="md:col-span-4">
             <h3 className="mb-3 text-sm font-semibold">دسته‌بندی‌ها</h3>
-            <ul className="space-y-2.5 text-sm text-muted-foreground">
-              <li><Link href="/categories/nextjs" className="transition-colors hover:text-foreground">Next.js</Link></li>
-              <li><Link href="/categories/react" className="transition-colors hover:text-foreground">React</Link></li>
-              <li><Link href="/categories/devops" className="transition-colors hover:text-foreground">DevOps</Link></li>
-              <li><Link href="/categories/ai" className="transition-colors hover:text-foreground">هوش مصنوعی</Link></li>
-            </ul>
+            {categories.length > 0 ? (
+              <ul className="space-y-2.5 text-sm text-muted-foreground">
+                {categories.map((category) => (
+                  <li key={category.id}>
+                    <Link
+                      href={`/categories/${category.slug}`}
+                      className="transition-colors hover:text-foreground"
+                    >
+                      {category.name}
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            ) : (
+              <p className="text-sm text-muted-foreground">
+                هنوز دسته‌بندی‌ای ثبت نشده.{" "}
+                <Link href="/blog" className="text-foreground underline-offset-4 hover:underline">
+                  مشاهده‌ی مقالات
+                </Link>
+              </p>
+            )}
           </div>
         </div>
 

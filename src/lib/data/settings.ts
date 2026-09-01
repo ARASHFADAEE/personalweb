@@ -26,9 +26,9 @@ const DEFAULTS: Settings = {
   siteDescription:
     "وبلاگ شخصی یک توسعه‌دهنده — مقالات تخصصی درباره‌ی Next.js، React، طراحی نرم‌افزار، DevOps و هوش مصنوعی.",
   logoText: "dev.net",
-  authorName: "آرین رضایی",
+  authorName: "آرش فدایی",
   authorBio:
-    "Full-Stack Developer با علاقه‌ی ویژه به Next.js و معماری نرم‌افزار. تجربه‌هایم را اینجا می‌نویسم تا هم مرتیز را یاد بگیرم، هم بقیه.",
+    "توسعه‌دهنده ارشد وب و متخصص PHP — درباره‌ی Laravel، Next.js و معماری نرم‌افزار می‌نویسم.",
   authorAvatar: "",
   socialGithub: "https://github.com/",
   socialLinkedin: "https://linkedin.com/",

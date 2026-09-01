@@ -1,6 +1,5 @@
 import Link from "next/link";
 import { Settings } from "@/lib/data/settings";
-import { Search, Menu } from "lucide-react";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { SearchTriggerButton } from "@/components/search-trigger";
 
@@ -39,17 +38,8 @@ export async function SiteHeader({ settings }: { settings: Settings }) {
         <div className="flex items-center gap-1.5">
           <SearchTriggerButton />
           <ThemeToggle />
-          <Link
-            href="/admin"
-            className="hidden md:inline-flex h-9 items-center rounded-md border border-border px-3 text-sm font-medium text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
-          >
-            پنل مدیریت
-          </Link>
         </div>
       </div>
     </header>
   );
 }
-
-// placeholder import to keep file happy if needed in future
-export { Menu, Search };

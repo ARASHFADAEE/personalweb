@@ -99,6 +99,7 @@ model Post {
   category   Category? @relation(fields: [categoryId], references: [id], onDelete: SetNull)
   tags       PostTag[]
   views      PostView[]
+  comments   Comment[]
   // SEO fields
   seoTitle          String?
   metaDescription   String?
@@ -119,6 +120,24 @@ model Post {
   @@index([categoryId])
   @@index([authorId])
   @@index([featured])
+}
+
+model Comment {
+  id          String   @id @default(cuid())
+  postId      String
+  authorName  String
+  authorEmail String?
+  content     String
+  status      String   @default("PENDING") // PENDING | APPROVED | REJECTED
+  ipHash      String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  post Post @relation(fields: [postId], references: [id], onDelete: Cascade)
+
+  @@index([postId])
+  @@index([status])
+  @@index([createdAt])
 }
 
 model PostTag {

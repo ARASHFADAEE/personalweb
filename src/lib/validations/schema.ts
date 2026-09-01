@@ -122,3 +122,15 @@ export const newsletterSchema = z.object({
   email: z.string().email("ایمیل معتبر نیست"),
 });
 export type NewsletterInput = z.infer<typeof newsletterSchema>;
+
+// ---------------------------------------------------------------------------
+// Comments
+// ---------------------------------------------------------------------------
+
+export const commentSchema = z.object({
+  authorName: z.string().min(2, "نام حداقل ۲ کاراکتر").max(80),
+  authorEmail: z.string().email("ایمیل معتبر نیست").optional().or(z.literal("")),
+  content: z.string().min(3, "متن نظر خیلی کوتاه است").max(2000),
+  website: z.string().max(0).optional(), // honeypot
+});
+export type CommentInput = z.infer<typeof commentSchema>;

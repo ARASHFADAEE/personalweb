@@ -15,7 +15,7 @@ export default async function AdminLoginPage() {
 
   const settings = await getSettings();
   return (
-    <div className="flex min-h-screen flex-col items-center justify-center bg-muted/30 p-4">
+    <div dir="rtl" lang="fa" className="admin-panel flex min-h-screen flex-col items-center justify-center bg-muted/30 p-4">
       <div className="w-full max-w-sm">
         <div className="mb-8 text-center">
           <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-xl bg-primary text-primary-foreground font-mono font-bold">

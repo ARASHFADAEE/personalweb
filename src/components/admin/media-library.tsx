@@ -11,7 +11,7 @@ type Media = {
   id: string; url: string; originalName: string;
   altText: string | null; caption: string | null;
   mimeType: string; size: number;
-  width: number | null; height: number | null; createdAt: string;
+  width: number | null; height: number | null; createdAt: Date | string;
 };
 
 function fmtSize(b: number): string {

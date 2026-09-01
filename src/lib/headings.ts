@@ -1,7 +1,7 @@
 // Extract heading structure from markdown (h2 and h3 only)
 export type Heading = { id: string; text: string; level: number };
 
-function slugifyHeading(text: string): string {
+export function slugifyHeading(text: string): string {
   return (
     text
       .toLowerCase()
@@ -26,7 +26,7 @@ export function extractHeadings(markdown: string): Heading[] {
     }
     if (inCodeBlock) continue;
 
-    const m = /^(#{2,3})\s+(.+?)\s*$/.exec(line);
+    const m = /^(#{2,4})\s+(.+?)\s*$/.exec(line);
     if (!m) continue;
     const level = m[1].length;
     const text = m[2].replace(/[#*_`~]/g, "").trim();

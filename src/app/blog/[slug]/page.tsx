@@ -24,6 +24,7 @@ import { ArticleCard } from "@/components/article-card";
 import { MarkdownRenderer } from "@/components/markdown-renderer";
 import { TableOfContents } from "@/components/table-of-contents";
 import { ShareButtons } from "@/components/share-buttons";
+import { ArticleComments } from "@/components/article-comments";
 import { ViewTracker } from "@/components/view-tracker";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -31,6 +32,7 @@ import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { formatJalali, formatJalaliShort } from "@/lib/jalali";
 import { toPersianDigits, formatCount } from "@/lib/slug";
 import { extractHeadings } from "@/lib/headings";
+import { cn } from "@/lib/utils";
 
 type Params = Promise<{ slug: string }>;
 
@@ -109,6 +111,23 @@ export default async function ArticlePage({ params }: { params: Params }) {
       <ViewTracker slug={post.slug} />
 
       <main className="flex-1">
+        {/* Cover hero — full width */}
+        {post.coverImage && (
+          <div className="relative w-full border-b border-border/60">
+            <div className="relative mx-auto aspect-[21/9] max-h-[520px] min-h-[220px] w-full max-w-6xl overflow-hidden sm:aspect-[2.2/1] lg:rounded-b-2xl">
+              <Image
+                src={post.coverImage}
+                alt={post.title}
+                fill
+                priority
+                sizes="100vw"
+                className="object-cover"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-background via-background/20 to-transparent" />
+            </div>
+          </div>
+        )}
+
         <article className="container mx-auto px-4 py-8 lg:px-6 lg:py-12">
           {/* Breadcrumb */}
           <nav className="mb-6 flex items-center gap-1.5 text-xs text-muted-foreground" aria-label="مسیر">
@@ -175,7 +194,7 @@ export default async function ArticlePage({ params }: { params: Params }) {
               )}
             </div>
 
-            {post.updatedAt > post.publishedAt && (
+            {post.publishedAt && post.updatedAt > post.publishedAt && (
               <p className="mt-3 flex items-center justify-center gap-1.5 text-xs text-muted-foreground">
                 <RotateCcw className="h-3 w-3" />
                 آخرین به‌روزرسانی: {formatJalaliShort(post.updatedAt)}
@@ -183,24 +202,19 @@ export default async function ArticlePage({ params }: { params: Params }) {
             )}
           </header>
 
-          {/* Cover */}
-          {post.coverImage && (
-            <div className="relative mx-auto mt-10 aspect-[16/9] max-w-4xl overflow-hidden rounded-2xl border border-border">
-              <Image
-                src={post.coverImage}
-                alt={post.title}
-                fill
-                priority
-                sizes="(max-width: 1024px) 100vw, 896px"
-                className="object-cover"
-              />
-            </div>
-          )}
-
           {/* Body + TOC */}
-          <div className="mt-10 grid gap-10 lg:grid-cols-[1fr,220px]">
+          <div className={cn("grid gap-10 lg:grid-cols-[1fr,240px]", post.coverImage ? "mt-8" : "mt-10")}>
             <div className="min-w-0">
-              <MarkdownRenderer content={post.content || ""} />
+              {headings.length > 0 && (
+                <div className="mb-8 lg:hidden">
+                  <TableOfContents headings={headings} variant="card" />
+                </div>
+              )}
+              <MarkdownRenderer
+                key={post.slug}
+                content={post.content || ""}
+                headings={headings}
+              />
 
               {/* Tags */}
               {post.tags.length > 0 && (
@@ -276,6 +290,8 @@ export default async function ArticlePage({ params }: { params: Params }) {
                   </div>
                 </div>
               </div>
+
+              <ArticleComments slug={post.slug} />
             </div>
 
             {/* TOC sidebar */}
