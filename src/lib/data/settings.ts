@@ -4,6 +4,10 @@ export type Settings = {
   siteName: string;
   siteDescription: string;
   logoText: string;
+  heroBadge: string;
+  heroTagline: string;
+  homeAboutTitle: string;
+  homeAboutText: string;
   authorName: string;
   authorBio: string;
   authorAvatar: string;
@@ -26,6 +30,11 @@ const DEFAULTS: Settings = {
   siteDescription:
     "وبلاگ شخصی یک توسعه‌دهنده — مقالات تخصصی درباره‌ی Next.js، React، طراحی نرم‌افزار، DevOps و هوش مصنوعی.",
   logoText: "dev.net",
+  heroBadge: "توسعه‌دهنده فول‌استک · کانال تخصصی",
+  heroTagline: "درباره‌ی کد و معماری می‌نویسم",
+  homeAboutTitle: "درباره‌ی من",
+  homeAboutText:
+    "من علاقه‌مند به ساخت محصول‌های سریع، قابل‌نگهداری و با تجربه‌ی کاربری خوبم. در اینجا درباره‌ی چالش‌های واقعی و راه‌حل‌هایی که پیدا می‌کنم می‌نویسم — نه چیزهای تئوریک و بی‌کاربرد.",
   authorName: "آرش فدایی",
   authorBio:
     "توسعه‌دهنده ارشد وب و متخصص PHP — درباره‌ی Laravel، Next.js و معماری نرم‌افزار می‌نویسم.",
@@ -61,6 +70,10 @@ export async function getSettings(): Promise<Settings> {
       ...(map.siteName ? { siteName: map.siteName } : {}),
       ...(map.siteDescription ? { siteDescription: map.siteDescription } : {}),
       ...(map.logoText ? { logoText: map.logoText } : {}),
+      ...(map.heroBadge ? { heroBadge: map.heroBadge } : {}),
+      ...(map.heroTagline ? { heroTagline: map.heroTagline } : {}),
+      ...(map.homeAboutTitle ? { homeAboutTitle: map.homeAboutTitle } : {}),
+      ...(map.homeAboutText ? { homeAboutText: map.homeAboutText } : {}),
       ...(map.authorName ? { authorName: map.authorName } : {}),
       ...(map.authorBio ? { authorBio: map.authorBio } : {}),
       ...(map.authorAvatar ? { authorAvatar: map.authorAvatar } : {}),

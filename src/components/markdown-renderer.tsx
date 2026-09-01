@@ -56,7 +56,7 @@ function createHeadingComponent(
     }
 
     return (
-      <Tag id={id} {...props}>
+      <Tag id={id} className="scroll-mt-28" {...props}>
         {children}
       </Tag>
     );

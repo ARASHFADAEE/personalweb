@@ -30,6 +30,7 @@ import {
 } from "@/components/ui/tabs";
 import { useToast } from "@/hooks/use-toast";
 import { slugify, toPersianDigits } from "@/lib/slug";
+import { resolvePostSeo } from "@/lib/post-seo";
 import { GooglePreview } from "@/components/admin/google-preview";
 import { MediaPickerButton } from "@/components/admin/media-picker-button";
 import {
@@ -139,14 +140,75 @@ export function PostEditor({
     }));
   };
 
+  const readingTime = contentStats.readingTime;
+  const editorKey = `${data.id ?? "new"}-${editorSession}`;
+
+  const siteUrl =
+    process.env.NEXT_PUBLIC_SITE_URL?.replace(/\/+$/, "") ||
+    (typeof window !== "undefined" ? window.location.origin : "http://localhost:3000");
+
+  const autoSeo = React.useMemo(
+    () =>
+      resolvePostSeo(
+        {
+          title: data.title,
+          slug: data.slug,
+          excerpt: data.excerpt,
+          coverImage: data.coverImage,
+          seoTitle: data.seoTitle,
+          metaDescription: data.metaDescription,
+          canonicalUrl: data.canonicalUrl,
+          ogTitle: data.ogTitle,
+          ogDescription: data.ogDescription,
+          ogImage: data.ogImage,
+          focusKeyword: data.focusKeyword,
+        },
+        siteUrl
+      ),
+    [data, siteUrl]
+  );
+
+  const buildPayload = React.useCallback(
+    (overrideStatus?: string) => {
+      const content = getEditorMarkdown();
+      const seo = resolvePostSeo(
+        {
+          title: data.title,
+          slug: data.slug,
+          excerpt: data.excerpt,
+          coverImage: data.coverImage,
+          seoTitle: data.seoTitle,
+          metaDescription: data.metaDescription,
+          canonicalUrl: data.canonicalUrl,
+          ogTitle: data.ogTitle,
+          ogDescription: data.ogDescription,
+          ogImage: data.ogImage,
+          focusKeyword: data.focusKeyword,
+        },
+        siteUrl
+      );
+      return {
+        ...data,
+        content,
+        ...seo,
+        ...(overrideStatus ? { status: overrideStatus } : {}),
+      };
+    },
+    [data, getEditorMarkdown, siteUrl]
+  );
+
   const save = async (overrideStatus?: string) => {
     if (!data.title.trim()) {
       toast({ variant: "destructive", title: "عنوان الزامی است" });
       return;
     }
     const content = getEditorMarkdown();
+    if (!content.trim() && overrideStatus === "PUBLISHED") {
+      toast({ variant: "destructive", title: "محتوای مقاله خالی است" });
+      return;
+    }
     setSaving(true);
-    const payload = { ...data, content, ...(overrideStatus ? { status: overrideStatus } : {}) };
+    const payload = buildPayload(overrideStatus);
     try {
       const url = data.id ? `/api/admin/posts/${data.id}` : "/api/admin/posts";
       const method = data.id ? "PUT" : "POST";
@@ -161,10 +223,23 @@ export function PostEditor({
         return;
       }
       toast({ title: "ذخیره شد", description: "مقاله با موفقیت ذخیره شد" });
+      const saved = result.post;
+      if (saved) {
+        setData((prev) => ({
+          ...prev,
+          id: saved.id ?? prev.id,
+          slug: saved.slug ?? prev.slug,
+          seoTitle: saved.seoTitle ?? prev.seoTitle,
+          metaDescription: saved.metaDescription ?? prev.metaDescription,
+          canonicalUrl: saved.canonicalUrl ?? prev.canonicalUrl,
+          ogTitle: saved.ogTitle ?? prev.ogTitle,
+          ogDescription: saved.ogDescription ?? prev.ogDescription,
+          ogImage: saved.ogImage ?? prev.ogImage,
+          focusKeyword: saved.focusKeyword ?? prev.focusKeyword,
+        }));
+      }
       if (!data.id && result.post?.id) {
         router.push(`/admin/posts/${result.post.id}/edit`);
-      } else {
-        setData((prev) => ({ ...prev, id: result.post?.id ?? prev.id, slug: result.post?.slug ?? prev.slug }));
       }
     } catch {
       toast({ variant: "destructive", title: "خطای شبکه" });
@@ -180,9 +255,6 @@ export function PostEditor({
     router.push("/admin/posts");
     router.refresh();
   };
-
-  const readingTime = contentStats.readingTime;
-  const editorKey = `${data.id ?? "new"}-${editorSession}`;
 
   return (
     <div className="space-y-5">
@@ -407,27 +479,72 @@ export function PostEditor({
 
         {/* SEO TAB */}
         <TabsContent value="seo" className="space-y-4">
+          <p className="text-sm text-muted-foreground">
+            فیلدهای خالی هنگام ذخیره به‌صورت خودکار از عنوان، خلاصه، نشانک و تصویر کاور پر می‌شوند.
+          </p>
           <div className="grid gap-4 lg:grid-cols-2">
             <div className="space-y-4">
               <div className="rounded-xl border border-border bg-card p-4 space-y-3">
                 <h3 className="text-sm font-semibold">متادیتای اصلی</h3>
                 <div>
                   <Label htmlFor="seo-title">عنوان سئو</Label>
-                  <Input id="seo-title" value={data.seoTitle} onChange={(e) => update({ seoTitle: e.target.value })} placeholder="عنوان سئو (60 کاراکتر)" className="mt-1.5" />
-                  <p className="mt-1 text-xs text-muted-foreground">{data.seoTitle.length}/60</p>
+                  <Input
+                    id="seo-title"
+                    value={data.seoTitle}
+                    onChange={(e) => update({ seoTitle: e.target.value })}
+                    placeholder={autoSeo.seoTitle}
+                    className="mt-1.5"
+                  />
+                  <p className="mt-1 text-xs text-muted-foreground">
+                    {(data.seoTitle || autoSeo.seoTitle).length}/60
+                    {!data.seoTitle.trim() && (
+                      <span className="ms-2 text-primary">خودکار: {autoSeo.seoTitle}</span>
+                    )}
+                  </p>
                 </div>
                 <div>
                   <Label htmlFor="meta-desc">توضیحات متا</Label>
-                  <Textarea id="meta-desc" value={data.metaDescription} onChange={(e) => update({ metaDescription: e.target.value })} rows={3} placeholder="توضیحات متا (160 کاراکتر)" className="mt-1.5" />
-                  <p className="mt-1 text-xs text-muted-foreground">{data.metaDescription.length}/160</p>
+                  <Textarea
+                    id="meta-desc"
+                    value={data.metaDescription}
+                    onChange={(e) => update({ metaDescription: e.target.value })}
+                    rows={3}
+                    placeholder={autoSeo.metaDescription}
+                    className="mt-1.5"
+                  />
+                  <p className="mt-1 text-xs text-muted-foreground">
+                    {(data.metaDescription || autoSeo.metaDescription).length}/160
+                    {!data.metaDescription.trim() && (
+                      <span className="ms-2 text-primary">خودکار از خلاصه</span>
+                    )}
+                  </p>
                 </div>
                 <div>
                   <Label htmlFor="canon">Canonical URL</Label>
-                  <Input id="canon" dir="ltr" value={data.canonicalUrl} onChange={(e) => update({ canonicalUrl: e.target.value })} placeholder="https://…" className="mt-1.5 text-left" />
+                  <Input
+                    id="canon"
+                    dir="ltr"
+                    value={data.canonicalUrl}
+                    onChange={(e) => update({ canonicalUrl: e.target.value })}
+                    placeholder={autoSeo.canonicalUrl}
+                    className="mt-1.5 text-left"
+                  />
+                  {!data.canonicalUrl.trim() && (
+                    <p className="mt-1 text-xs text-primary">خودکار: {autoSeo.canonicalUrl}</p>
+                  )}
                 </div>
                 <div>
                   <Label htmlFor="focus">کلمه‌ی کلیدی</Label>
-                  <Input id="focus" value={data.focusKeyword} onChange={(e) => update({ focusKeyword: e.target.value })} placeholder="مثلاً: nextjs server actions" className="mt-1.5" />
+                  <Input
+                    id="focus"
+                    value={data.focusKeyword}
+                    onChange={(e) => update({ focusKeyword: e.target.value })}
+                    placeholder={autoSeo.focusKeyword ?? "از عنوان استخراج می‌شود"}
+                    className="mt-1.5"
+                  />
+                  {!data.focusKeyword.trim() && autoSeo.focusKeyword && (
+                    <p className="mt-1 text-xs text-primary">خودکار: {autoSeo.focusKeyword}</p>
+                  )}
                 </div>
               </div>
 
@@ -435,15 +552,43 @@ export function PostEditor({
                 <h3 className="text-sm font-semibold">Open Graph</h3>
                 <div>
                   <Label htmlFor="og-title">عنوان OG</Label>
-                  <Input id="og-title" value={data.ogTitle} onChange={(e) => update({ ogTitle: e.target.value })} placeholder="عنوان شبکه‌های اجتماعی" className="mt-1.5" />
+                  <Input
+                    id="og-title"
+                    value={data.ogTitle}
+                    onChange={(e) => update({ ogTitle: e.target.value })}
+                    placeholder={autoSeo.ogTitle}
+                    className="mt-1.5"
+                  />
+                  {!data.ogTitle.trim() && (
+                    <p className="mt-1 text-xs text-primary">خودکار: همان عنوان سئو</p>
+                  )}
                 </div>
                 <div>
                   <Label htmlFor="og-desc">توضیحات OG</Label>
-                  <Textarea id="og-desc" value={data.ogDescription} onChange={(e) => update({ ogDescription: e.target.value })} rows={2} className="mt-1.5" />
+                  <Textarea
+                    id="og-desc"
+                    value={data.ogDescription}
+                    onChange={(e) => update({ ogDescription: e.target.value })}
+                    rows={2}
+                    placeholder={autoSeo.ogDescription}
+                    className="mt-1.5"
+                  />
+                  {!data.ogDescription.trim() && (
+                    <p className="mt-1 text-xs text-primary">خودکار: همان توضیحات متا</p>
+                  )}
                 </div>
                 <div>
                   <Label>تصویر OG</Label>
-                  <Input dir="ltr" value={data.ogImage} onChange={(e) => update({ ogImage: e.target.value })} placeholder="https://… (1200×630)" className="mt-1.5 text-left" />
+                  <Input
+                    dir="ltr"
+                    value={data.ogImage}
+                    onChange={(e) => update({ ogImage: e.target.value })}
+                    placeholder={autoSeo.ogImage ?? "https://… (1200×630)"}
+                    className="mt-1.5 text-left"
+                  />
+                  {!data.ogImage.trim() && data.coverImage && (
+                    <p className="mt-1 text-xs text-primary">خودکار: تصویر کاور</p>
+                  )}
                 </div>
               </div>
             </div>
@@ -455,15 +600,15 @@ export function PostEditor({
                   پیش‌نمایش گوگل
                 </h3>
                 <GooglePreview
-                  title={data.seoTitle || data.title || "عنوان مقاله"}
-                  url={`/blog/${data.slug || "slug"}`}
-                  description={data.metaDescription || data.excerpt || "توضیحات متا را اینجا بنویسید تا در نتایج جستجو نمایش داده شود."}
+                  title={autoSeo.seoTitle}
+                  url={autoSeo.canonicalUrl}
+                  description={autoSeo.metaDescription}
                 />
               </div>
 
               <div className="rounded-xl border border-border bg-card p-4">
                 <h3 className="mb-3 text-sm font-semibold">تحلیل سریع سئو</h3>
-                <SeoChecklist data={data} />
+                <SeoChecklist data={data} autoSeo={autoSeo} />
               </div>
             </div>
           </div>
@@ -473,17 +618,28 @@ export function PostEditor({
   );
 }
 
-function SeoChecklist({ data }: { data: PostData }) {
+function SeoChecklist({
+  data,
+  autoSeo,
+}: {
+  data: PostData;
+  autoSeo: ReturnType<typeof resolvePostSeo>;
+}) {
+  const seoTitle = data.seoTitle.trim() || autoSeo.seoTitle;
+  const metaDescription = data.metaDescription.trim() || autoSeo.metaDescription;
+  const ogImage = data.ogImage.trim() || autoSeo.ogImage;
+  const focusKeyword = data.focusKeyword.trim() || autoSeo.focusKeyword;
+
   const items = [
     { ok: data.title.length >= 10 && data.title.length <= 70, label: "طول عنوان مناسب (۱۰–۷۰)" },
-    { ok: data.seoTitle.length > 0 && data.seoTitle.length <= 60, label: "عنوان سئو تنظیم‌شده (≤۶۰)" },
-    { ok: data.metaDescription.length >= 50 && data.metaDescription.length <= 160, label: "توضیحات متا (۵۰–۱۶۰)" },
+    { ok: seoTitle.length > 0 && seoTitle.length <= 60, label: "عنوان سئو (≤۶۰)" },
+    { ok: metaDescription.length >= 50 && metaDescription.length <= 160, label: "توضیحات متا (۵۰–۱۶۰)" },
     { ok: data.slug.length > 0, label: "نشانک (slug) تنظیم‌شده" },
     { ok: !!data.categoryId, label: "دسته‌بندی انتخاب‌شده" },
     { ok: data.tagIds.length > 0, label: "حداقل یک تگ" },
     { ok: !!data.coverImage, label: "تصویر کاور" },
-    { ok: !!data.focusKeyword, label: "کلمه‌ی کلیدی تعیین‌شده" },
-    { ok: !!data.ogImage, label: "تصویر OG" },
+    { ok: !!focusKeyword, label: "کلمه‌ی کلیدی" },
+    { ok: !!ogImage, label: "تصویر OG" },
   ];
   return (
     <ul className="space-y-1.5 text-sm">

@@ -225,6 +225,18 @@
     line-height: 2;
     letter-spacing: -0.003em;
   }
+  @media (max-width: 640px) {
+    .prose-article {
+      font-size: 1rem;
+      line-height: 1.95;
+    }
+    .prose-article h2 {
+      font-size: 1.375rem;
+    }
+    .prose-article h3 {
+      font-size: 1.15rem;
+    }
+  }
   .prose-article > * + * {
     margin-top: 1.4em;
   }

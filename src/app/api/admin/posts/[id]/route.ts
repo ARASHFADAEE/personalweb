@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/lib/db";
 import { getSessionUser } from "@/lib/auth";
 import { slugify } from "@/lib/slug";
+import { applyPostSeoDefaults } from "@/lib/post-seo";
 
 export async function GET(_req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   const user = await getSessionUser();
@@ -55,7 +56,23 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: 
   }
   if (typeof body.featured === "boolean") data.featured = body.featured;
   if (body.categoryId !== undefined) data.categoryId = (body.categoryId as string) || null;
-  Object.assign(data, sanitizeSeo(body));
+
+  const nextTitle = typeof data.title === "string" ? data.title : existing.title;
+  const nextSlug = typeof data.slug === "string" ? data.slug : existing.slug;
+  const nextExcerpt =
+    typeof data.excerpt === "string" ? data.excerpt : existing.excerpt;
+  const nextCover =
+    typeof data.coverImage === "string" ? data.coverImage : existing.coverImage;
+
+  Object.assign(
+    data,
+    applyPostSeoDefaults(body, {
+      title: nextTitle,
+      slug: nextSlug,
+      excerpt: nextExcerpt,
+      coverImage: nextCover,
+    })
+  );
 
   const tagIds = Array.isArray(body.tagIds) ? body.tagIds.filter((t): t is string => typeof t === "string") : null;
 
@@ -78,23 +95,4 @@ export async function DELETE(_req: NextRequest, { params }: { params: Promise<{ 
   const { id } = await params;
   await db.post.delete({ where: { id } }).catch(() => {});
   return NextResponse.json({ ok: true });
-}
-
-function sanitizeSeo(seo: Record<string, unknown>) {
-  const out: Record<string, string | boolean | null> = {};
-  const str = (k: string) => {
-    const v = seo[k];
-    if (typeof v === "string") return v.trim() || null;
-    return undefined;
-  };
-  const s = str("seoTitle"); if (s !== undefined) out.seoTitle = s;
-  const md = str("metaDescription"); if (md !== undefined) out.metaDescription = md;
-  const cu = str("canonicalUrl"); if (cu !== undefined) out.canonicalUrl = cu;
-  const ot = str("ogTitle"); if (ot !== undefined) out.ogTitle = ot;
-  const od = str("ogDescription"); if (od !== undefined) out.ogDescription = od;
-  const og = str("ogImage"); if (og !== undefined) out.ogImage = og;
-  const fk = str("focusKeyword"); if (fk !== undefined) out.focusKeyword = fk;
-  if (typeof seo.robotsNoindex === "boolean") out.robotsNoindex = seo.robotsNoindex;
-  if (typeof seo.robotsNofollow === "boolean") out.robotsNofollow = seo.robotsNofollow;
-  return out;
 }

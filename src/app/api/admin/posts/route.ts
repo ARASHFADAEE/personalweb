@@ -3,6 +3,7 @@ import { db } from "@/lib/db";
 import { getSessionUser } from "@/lib/auth";
 import { listAllPosts } from "@/lib/data/posts";
 import { slugify } from "@/lib/slug";
+import { applyPostSeoDefaults } from "@/lib/post-seo";
 
 // List all posts (admin) — includes drafts
 export async function GET(req: NextRequest) {
@@ -65,30 +66,16 @@ export async function POST(req: NextRequest) {
       authorId: user.id,
       categoryId: (body.categoryId as string) || null,
       readingTime,
-      ...sanitizeSeo(body),
+      ...applyPostSeoDefaults(body, {
+        title,
+        slug: finalSlug,
+        excerpt: String(body.excerpt ?? "").trim() || null,
+        coverImage: String(body.coverImage ?? "").trim() || null,
+      }),
       tags: tagIds.length ? { create: tagIds.map((tid) => ({ tagId: tid })) } : undefined,
     },
     include: { category: true, tags: { include: { tag: true } } },
   });
 
   return NextResponse.json({ post });
-}
-
-function sanitizeSeo(seo: Record<string, unknown>) {
-  const out: Record<string, string | boolean | null> = {};
-  const str = (k: string) => {
-    const v = seo[k];
-    if (typeof v === "string") return v.trim() || null;
-    return undefined;
-  };
-  const s = str("seoTitle"); if (s !== undefined) out.seoTitle = s;
-  const md = str("metaDescription"); if (md !== undefined) out.metaDescription = md;
-  const cu = str("canonicalUrl"); if (cu !== undefined) out.canonicalUrl = cu;
-  const ot = str("ogTitle"); if (ot !== undefined) out.ogTitle = ot;
-  const od = str("ogDescription"); if (od !== undefined) out.ogDescription = od;
-  const og = str("ogImage"); if (og !== undefined) out.ogImage = og;
-  const fk = str("focusKeyword"); if (fk !== undefined) out.focusKeyword = fk;
-  if (typeof seo.robotsNoindex === "boolean") out.robotsNoindex = seo.robotsNoindex;
-  if (typeof seo.robotsNofollow === "boolean") out.robotsNofollow = seo.robotsNofollow;
-  return out;
 }

@@ -19,8 +19,11 @@ export async function SiteFooter({ settings }: { settings: Settings }) {
               <span className="font-mono text-lg font-semibold tracking-tight">
                 {settings.logoText}
               </span>
+              <span className="sr-only">{settings.siteName}</span>
             </Link>
             <p className="mt-3 max-w-md text-sm leading-7 text-muted-foreground text-pretty">
+              <span className="font-medium text-foreground">{settings.siteName}</span>
+              {" — "}
               {settings.siteDescription}
             </p>
             <div className="mt-4 flex items-center gap-2">

@@ -2,6 +2,7 @@ import Link from "next/link";
 import { Settings } from "@/lib/data/settings";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { SearchTriggerButton } from "@/components/search-trigger";
+import { AdminPanelLink } from "@/components/admin-quick-actions";
 
 const NAV = [
   { label: "وبلاگ", href: "/blog" },
@@ -36,6 +37,7 @@ export async function SiteHeader({ settings }: { settings: Settings }) {
         </div>
 
         <div className="flex items-center gap-1.5">
+          <AdminPanelLink />
           <SearchTriggerButton />
           <ThemeToggle />
         </div>

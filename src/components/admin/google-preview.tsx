@@ -2,17 +2,19 @@ export function GooglePreview({
   title,
   url,
   description,
+  brandName = "dev.net",
 }: {
   title: string;
   url: string;
   description: string;
+  brandName?: string;
 }) {
-  const displayUrl = url.replace(/^\//, "");
+  const displayUrl = url.replace(/^https?:\/\/[^/]+/, "").replace(/^\//, "") || url.replace(/^\//, "");
   return (
     <div className="rounded-lg border border-border bg-white p-4 dark:bg-[#1a1a1f]" dir="ltr">
       <div className="max-w-xl">
         <p className="text-xs text-[#5f6368] dark:text-[#9aa0a6]">
-          {`dev.net › ${displayUrl}`}
+          {`${brandName} › ${displayUrl}`}
         </p>
         <h3 className="mt-1 text-xl leading-7 text-[#1a0dab] dark:text-[#8ab4f8] hover:underline cursor-pointer line-clamp-1">
           {title || "عنوان مقاله"}

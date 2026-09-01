@@ -536,6 +536,14 @@ fetch(url, { next: { revalidate: 3600 } });
     data: [
       { key: "siteName", value: "دِو‌نت" },
       { key: "logoText", value: "dev.net" },
+      { key: "heroBadge", value: "توسعه‌دهنده فول‌استک · کانال تخصصی" },
+      { key: "heroTagline", value: "درباره‌ی کد و معماری می‌نویسم" },
+      { key: "homeAboutTitle", value: "درباره‌ی من" },
+      {
+        key: "homeAboutText",
+        value:
+          "من علاقه‌مند به ساخت محصول‌های سریع، قابل‌نگهداری و با تجربه‌ی کاربری خوبم. در اینجا درباره‌ی چالش‌های واقعی و راه‌حل‌هایی که پیدا می‌کنم می‌نویسم — نه چیزهای تئوریک و بی‌کاربرد.",
+      },
       { key: "authorName", value: "آرش فدایی" },
       { key: "newsletterEnabled", value: "true" },
     ],

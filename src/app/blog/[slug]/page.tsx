@@ -25,6 +25,7 @@ import { MarkdownRenderer } from "@/components/markdown-renderer";
 import { TableOfContents } from "@/components/table-of-contents";
 import { ShareButtons } from "@/components/share-buttons";
 import { ArticleComments } from "@/components/article-comments";
+import { AdminEditPostLink } from "@/components/admin-quick-actions";
 import { ViewTracker } from "@/components/view-tracker";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -128,7 +129,7 @@ export default async function ArticlePage({ params }: { params: Params }) {
           </div>
         )}
 
-        <article className="container mx-auto px-4 py-8 lg:px-6 lg:py-12">
+        <article className="container mx-auto px-4 py-6 sm:py-8 lg:px-6 lg:py-12" itemScope itemType="https://schema.org/Article">
           {/* Breadcrumb */}
           <nav className="mb-6 flex items-center gap-1.5 text-xs text-muted-foreground" aria-label="مسیر">
             <Link href="/" className="hover:text-foreground">خانه</Link>
@@ -155,11 +156,11 @@ export default async function ArticlePage({ params }: { params: Params }) {
                 </Badge>
               </Link>
             )}
-            <h1 className="text-balance text-3xl font-extrabold leading-[1.25] tracking-tight sm:text-4xl lg:text-[2.75rem]">
+            <h1 className="text-balance text-3xl font-extrabold leading-[1.25] tracking-tight sm:text-4xl lg:text-[2.75rem]" itemProp="headline">
               {post.title}
             </h1>
             {post.excerpt && (
-              <p className="mt-5 text-balance text-lg leading-8 text-muted-foreground text-pretty">
+              <p className="mt-4 text-balance text-base leading-8 text-muted-foreground text-pretty sm:mt-5 sm:text-lg" itemProp="description">
                 {post.excerpt}
               </p>
             )}
@@ -175,10 +176,10 @@ export default async function ArticlePage({ params }: { params: Params }) {
                 <span className="font-medium text-foreground">{post.author.name}</span>
               </div>
               {post.publishedAt && (
-                <span className="flex items-center gap-1.5">
+                <time dateTime={post.publishedAt.toISOString()} className="flex items-center gap-1.5" itemProp="datePublished">
                   <Calendar className="h-3.5 w-3.5" />
                   {formatJalali(post.publishedAt)}
-                </span>
+                </time>
               )}
               {post.readingTime > 0 && (
                 <span className="flex items-center gap-1.5">
@@ -202,12 +203,18 @@ export default async function ArticlePage({ params }: { params: Params }) {
             )}
           </header>
 
-          {/* Body + TOC */}
-          <div className={cn("grid gap-10 lg:grid-cols-[1fr,240px]", post.coverImage ? "mt-8" : "mt-10")}>
-            <div className="min-w-0">
+          {/* Body + TOC — aside first in DOM so RTL places TOC on the start side */}
+          <div className={cn("lg:grid lg:grid-cols-[16rem_minmax(0,1fr)] lg:items-start lg:gap-10", post.coverImage ? "mt-8" : "mt-10")}>
+            {headings.length > 0 && (
+              <aside className="hidden lg:block lg:sticky lg:top-24 lg:col-start-1 lg:row-start-1 lg:max-h-[calc(100vh-7rem)] lg:self-start lg:overflow-y-auto">
+                <TableOfContents headings={headings} />
+              </aside>
+            )}
+
+            <div className={cn("min-w-0", headings.length > 0 && "lg:col-start-2")}>
               {headings.length > 0 && (
-                <div className="mb-8 lg:hidden">
-                  <TableOfContents headings={headings} variant="card" />
+                <div className="mb-6 sm:mb-8 lg:hidden">
+                  <TableOfContents headings={headings} variant="card" defaultOpen />
                 </div>
               )}
               <MarkdownRenderer
@@ -293,13 +300,6 @@ export default async function ArticlePage({ params }: { params: Params }) {
 
               <ArticleComments slug={post.slug} />
             </div>
-
-            {/* TOC sidebar */}
-            <aside className="hidden lg:block">
-              <div className="sticky top-24">
-                <TableOfContents headings={headings} />
-              </div>
-            </aside>
           </div>
 
           {/* Related */}
@@ -320,6 +320,7 @@ export default async function ArticlePage({ params }: { params: Params }) {
       </main>
 
       <SiteFooter settings={settings} />
+      <AdminEditPostLink postId={post.id} title={post.title} />
 
       <script
         type="application/ld+json"

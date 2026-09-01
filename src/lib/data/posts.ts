@@ -1,7 +1,15 @@
 import { db } from "@/lib/db";
 import { Prisma } from "@prisma/client";
 
-const PUBLISHED_WHERE = { status: "PUBLISHED", publishedAt: { lte: new Date() } } as const;
+/** Published posts visible on the public site (includes legacy rows with null publishedAt). */
+function publishedWhere(now = new Date()): Prisma.PostWhereInput {
+  return {
+    status: "PUBLISHED",
+    OR: [{ publishedAt: null }, { publishedAt: { lte: now } }],
+  };
+}
+
+const PUBLISHED_WHERE = publishedWhere();
 
 // ---------------------------------------------------------------------------
 // Public: list posts (blog page) with search, filter, sort, pagination
@@ -78,7 +86,7 @@ export async function listPublishedPosts(opts: {
 
 export async function getPublishedPostBySlug(slug: string) {
   return db.post.findFirst({
-    where: { slug, status: "PUBLISHED" },
+    where: { slug, ...publishedWhere() },
     include: {
       category: true,
       author: { select: { id: true, name: true, bio: true, avatarUrl: true } },
@@ -104,8 +112,8 @@ export async function getPostById(id: string) {
 
 export async function getFeaturedPosts(limit = 3) {
   return db.post.findMany({
-    where: { ...PUBLISHED_WHERE, featured: true },
-    orderBy: { publishedAt: "desc" },
+    where: { ...publishedWhere(), featured: true },
+    orderBy: [{ publishedAt: "desc" }, { createdAt: "desc" }],
     take: limit,
     include: {
       category: true,
@@ -115,10 +123,14 @@ export async function getFeaturedPosts(limit = 3) {
   });
 }
 
+export async function countPublishedPosts() {
+  return db.post.count({ where: publishedWhere() });
+}
+
 export async function getLatestPosts(limit = 6, excludeIds: string[] = []) {
   return db.post.findMany({
-    where: { ...PUBLISHED_WHERE, ...(excludeIds.length ? { id: { notIn: excludeIds } } : {}) },
-    orderBy: { publishedAt: "desc" },
+    where: { ...publishedWhere(), ...(excludeIds.length ? { id: { notIn: excludeIds } } : {}) },
+    orderBy: [{ publishedAt: "desc" }, { createdAt: "desc" }],
     take: limit,
     include: {
       category: true,

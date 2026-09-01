@@ -40,14 +40,35 @@ export function SettingsForm({ initial }: { initial: Settings }) {
 
         <TabsContent value="general" className="space-y-4">
           <Card>
-            <Field label="نام سایت"><Input value={data.siteName} onChange={(e) => update({ siteName: e.target.value })} /></Field>
-            <Field label="متن لوگو"><Input value={data.logoText} onChange={(e) => update({ logoText: e.target.value })} className="font-mono text-left" dir="ltr" /></Field>
-            <Field label="توضیحات سایت"><Textarea value={data.siteDescription} onChange={(e) => update({ siteDescription: e.target.value })} rows={3} /></Field>
-            <Field label="متن فوتر"><Input value={data.footerNote} onChange={(e) => update({ footerNote: e.target.value })} /></Field>
+            <p className="text-sm text-muted-foreground">
+              نام برند و متن‌های صفحه اصلی از اینجا مدیریت می‌شوند.
+            </p>
+            <Field label="نام برند (سایت)">
+              <Input value={data.siteName} onChange={(e) => update({ siteName: e.target.value })} placeholder="مثلاً دِو‌نت" />
+            </Field>
+            <Field label="متن لوگو (header)">
+              <Input value={data.logoText} onChange={(e) => update({ logoText: e.target.value })} className="font-mono text-left" dir="ltr" placeholder="dev.net" />
+            </Field>
+            <Field label="توضیحات سایت (فوتر و متا)">
+              <Textarea value={data.siteDescription} onChange={(e) => update({ siteDescription: e.target.value })} rows={3} />
+            </Field>
+            <Field label="متن فوتر">
+              <Input value={data.footerNote} onChange={(e) => update({ footerNote: e.target.value })} />
+            </Field>
             <div className="flex items-center justify-between pt-2">
               <Label htmlFor="nl">خبرنامه فعال</Label>
               <Switch id="nl" checked={data.newsletterEnabled} onCheckedChange={(c) => update({ newsletterEnabled: Boolean(c) })} />
             </div>
+          </Card>
+
+          <Card>
+            <p className="text-sm text-muted-foreground">بخش Hero در بالای صفحه اصلی</p>
+            <Field label="برچسب Hero">
+              <Input value={data.heroBadge} onChange={(e) => update({ heroBadge: e.target.value })} placeholder="توسعه‌دهنده فول‌استک · کانال تخصصی" />
+            </Field>
+            <Field label="زیرعنوان Hero (خط رنگی)">
+              <Input value={data.heroTagline} onChange={(e) => update({ heroTagline: e.target.value })} placeholder="درباره‌ی کد و معماری می‌نویسم" />
+            </Field>
           </Card>
         </TabsContent>
 
@@ -56,8 +77,24 @@ export function SettingsForm({ initial }: { initial: Settings }) {
             <p className="text-sm text-muted-foreground">
               نام و اطلاعات نویسنده در صفحه اصلی، درباره‌ی من، فوتر و متادیتای مقالات نمایش داده می‌شود.
             </p>
-            <Field label="نام نویسنده"><Input value={data.authorName} onChange={(e) => update({ authorName: e.target.value })} placeholder="مثلاً آرش فدایی" /></Field>
-            <Field label="بیوگرافی"><Textarea value={data.authorBio} onChange={(e) => update({ authorBio: e.target.value })} rows={4} /></Field>
+            <Field label="نام نویسنده">
+              <Input value={data.authorName} onChange={(e) => update({ authorName: e.target.value })} placeholder="مثلاً آرش فدایی" />
+            </Field>
+            <Field label="بیوگرافی کوتاه (Hero و درباره)">
+              <Textarea value={data.authorBio} onChange={(e) => update({ authorBio: e.target.value })} rows={4} />
+            </Field>
+            <Field label="عنوان بخش «درباره من» در صفحه اصلی">
+              <Input value={data.homeAboutTitle} onChange={(e) => update({ homeAboutTitle: e.target.value })} placeholder="درباره‌ی من" />
+            </Field>
+            <Field label="متن تکمیلی «درباره من» (صفحه اصلی)">
+              <Textarea
+                value={data.homeAboutText}
+                onChange={(e) => update({ homeAboutText: e.target.value })}
+                rows={5}
+                placeholder="هر پاراگراف را با یک خط خالی جدا کنید."
+              />
+              <p className="mt-1 text-xs text-muted-foreground">برای چند پاراگراف، بین آن‌ها یک خط خالی بگذارید.</p>
+            </Field>
             <Field label="آواتار (URL)"><Input dir="ltr" value={data.authorAvatar} onChange={(e) => update({ authorAvatar: e.target.value })} className="text-left" placeholder="https://…" /></Field>
             <div className="grid gap-4 sm:grid-cols-2 pt-2">
               <Field label="گیت‌هاب"><Input dir="ltr" value={data.socialGithub} onChange={(e) => update({ socialGithub: e.target.value })} className="text-left" placeholder="https://github.com/…" /></Field>

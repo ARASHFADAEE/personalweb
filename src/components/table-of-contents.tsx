@@ -45,12 +45,14 @@ function TocList({
 export function TableOfContents({
   headings,
   variant = "sidebar",
+  defaultOpen = true,
 }: {
   headings: Heading[];
   variant?: "sidebar" | "card";
+  defaultOpen?: boolean;
 }) {
   const [activeId, setActiveId] = React.useState<string>("");
-  const [open, setOpen] = React.useState(true);
+  const [open, setOpen] = React.useState(defaultOpen);
 
   React.useEffect(() => {
     if (headings.length === 0) return;
@@ -109,7 +111,7 @@ export function TableOfContents({
 
   return (
     <nav
-      className="rounded-2xl border border-border/70 bg-card/60 p-4 text-sm backdrop-blur-sm"
+      className="rounded-2xl border border-border/70 bg-card/60 p-4 text-sm backdrop-blur-sm lg:shadow-sm"
       aria-label="فهرست مطالب"
     >
       <p className="mb-3 inline-flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-muted-foreground">

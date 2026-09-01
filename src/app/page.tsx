@@ -4,6 +4,7 @@ import type { Metadata } from "next";
 import { ArrowLeft, Github, Linkedin, Mail, Sparkles, BookOpen, FolderGit2, PenLine } from "lucide-react";
 import { getSettings } from "@/lib/data/settings";
 import {
+  countPublishedPosts,
   getFeaturedPosts,
   getLatestPosts,
   listCategoriesWithCount,
@@ -19,19 +20,27 @@ import { formatJalali } from "@/lib/jalali";
 import { formatCount } from "@/lib/slug";
 import { HeroStatusBadge } from "@/components/hero-status-badge";
 
-export const revalidate = 3600; // revalidate homepage every hour
+export const revalidate = 60;
 
 export default async function HomePage() {
   const settings = await getSettings();
-  const [featuredPosts, latestPosts, categories, projects] = await Promise.all([
+  const [featuredPostsRaw, latestPosts, categories, projects, postsCount] = await Promise.all([
     getFeaturedPosts(3),
     getLatestPosts(6, []),
     listCategoriesWithCount(),
     listPublishedProjects(true),
+    countPublishedPosts(),
   ]);
 
+  const featuredPosts =
+    featuredPostsRaw.length > 0 ? featuredPostsRaw : latestPosts.slice(0, 3);
+  const latestForList =
+    featuredPostsRaw.length > 0
+      ? latestPosts.filter((p) => !featuredPostsRaw.some((f) => f.id === p.id))
+      : latestPosts.slice(featuredPosts.length);
+
   const stats = [
-    { label: "مقالات", value: formatCount(latestPosts.length) },
+    { label: "مقالات", value: formatCount(postsCount) },
     { label: "دسته‌بندی", value: formatCount(categories.length) },
     { label: "پروژه", value: formatCount(projects.length) },
   ];
@@ -61,12 +70,12 @@ export default async function HomePage() {
               <div className="mx-auto max-w-3xl text-center lg:mx-0 lg:text-right">
                 <Badge variant="outline" className="mb-5 gap-1.5 bg-background/60 py-1 text-xs font-medium text-muted-foreground">
                   <Sparkles className="h-3.5 w-3.5 text-primary" />
-                  توسعه‌دهنده فول‌استک · کانال تخصصی
+                  {settings.heroBadge}
                 </Badge>
                 <h1 className="text-balance text-4xl font-extrabold leading-[1.15] tracking-tight sm:text-5xl lg:text-6xl">
                   {settings.authorName}
                   <span className="block bg-gradient-to-l from-primary via-primary to-primary/60 bg-clip-text text-transparent">
-                    درباره‌ی کد و معماری می‌نویسم
+                    {settings.heroTagline}
                   </span>
                 </h1>
                 <p className="mx-auto mt-6 max-w-2xl text-balance text-lg leading-8 text-muted-foreground text-pretty lg:mx-0">
@@ -179,9 +188,15 @@ export default async function HomePage() {
                   icon={<BookOpen className="h-4 w-4" />}
                 />
                 <div className="mt-6">
-                  {latestPosts.map((p) => (
-                    <ArticleCard key={p.id} post={p} variant="list" />
-                  ))}
+                  {latestForList.length > 0 ? (
+                    latestForList.map((p) => (
+                      <ArticleCard key={p.id} post={p} variant="list" />
+                    ))
+                  ) : postsCount === 0 ? (
+                    <p className="rounded-xl border border-dashed border-border bg-muted/20 px-4 py-8 text-center text-sm text-muted-foreground">
+                      هنوز مقاله‌ای منتشر نشده است.
+                    </p>
+                  ) : null}
                 </div>
                 <div className="mt-6 text-left">
                   <Button asChild variant="ghost" className="gap-2">
@@ -287,13 +302,16 @@ export default async function HomePage() {
           <div className="container mx-auto px-4 py-16 lg:px-6 lg:py-20">
             <div className="grid gap-8 lg:grid-cols-12">
               <div className="lg:col-span-7">
-                <SectionHeader eyebrow="آشنایی" title="درباره‌ی من" icon={<PenLine className="h-4 w-4" />} />
+                <SectionHeader eyebrow="آشنایی" title={settings.homeAboutTitle} icon={<PenLine className="h-4 w-4" />} />
                 <div className="mt-6 max-w-2xl space-y-4 text-base leading-8 text-muted-foreground text-pretty">
                   <p>{settings.authorBio}</p>
-                  <p>
-                    من علاقه‌مند به ساخت محصول‌های سریع، قابل‌نگهداری و با تجربه‌ی کاربری خوبم.
-                    در اینجا درباره‌ی چالش‌های واقعی و راه‌حل‌هایی که پیدا می‌کنم می‌نویسم — نه چیزهای تئوریک و بی‌کاربرد.
-                  </p>
+                  {settings.homeAboutText
+                    .split(/\n{2,}/)
+                    .map((paragraph) => paragraph.trim())
+                    .filter(Boolean)
+                    .map((paragraph) => (
+                      <p key={paragraph.slice(0, 40)}>{paragraph}</p>
+                    ))}
                   <Button asChild variant="outline" className="mt-3 gap-2">
                     <Link href="/about">
                       بیشتر بدانید
