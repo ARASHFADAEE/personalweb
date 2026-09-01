@@ -5,6 +5,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { parseProjectTechnologies, type ProjectRecord } from "@/lib/project-utils";
+import { ProjectDescription } from "@/components/project-description";
 
 type ProjectCardProps = {
   project: ProjectRecord;
@@ -99,7 +100,7 @@ export function ProjectCard({ project, variant = "default", priority = false, in
               </Badge>
             )}
             <h3 className="text-balance text-2xl font-extrabold leading-9 text-white sm:text-3xl">{project.title}</h3>
-            <p className="mt-3 line-clamp-2 max-w-2xl text-sm leading-7 text-white/80 sm:text-base">{project.description}</p>
+            <ProjectDescription content={project.description} inverted clamp={2} className="mt-3 max-w-2xl text-sm sm:text-base" />
           </div>
         </Link>
         <div className="flex flex-wrap items-center justify-between gap-4 border-t border-border/60 p-5 sm:p-6">
@@ -144,7 +145,7 @@ export function ProjectCard({ project, variant = "default", priority = false, in
             <h3 className="text-lg font-bold leading-8 tracking-tight sm:text-xl">
               <Link href={href} className="transition-colors hover:text-primary">{project.title}</Link>
             </h3>
-            <p className="mt-2 line-clamp-2 text-sm leading-7 text-muted-foreground text-pretty">{project.description}</p>
+            <ProjectDescription content={project.description} clamp={2} className="mt-2 text-sm" />
             <div className="mt-4 space-y-3">
               <TechPills techs={techs} />
               <ProjectLinks demoUrl={project.demoUrl} repoUrl={project.repoUrl} />
@@ -184,7 +185,7 @@ export function ProjectCard({ project, variant = "default", priority = false, in
           <h3 className="text-lg font-bold leading-8 tracking-tight">
             <Link href={href} className="transition-colors hover:text-primary">{project.title}</Link>
           </h3>
-          <p className="mt-2 line-clamp-2 text-sm leading-7 text-muted-foreground text-pretty">{project.description}</p>
+          <ProjectDescription content={project.description} clamp={2} className="mt-2 text-sm" />
           <div className="mt-auto space-y-3 pt-4">
             <TechPills techs={techs} />
             <ProjectLinks demoUrl={project.demoUrl} repoUrl={project.repoUrl} />
@@ -217,7 +218,7 @@ export function ProjectCard({ project, variant = "default", priority = false, in
         <h3 className="text-lg font-bold leading-8 tracking-tight text-balance">
           <Link href={href} className="transition-colors hover:text-primary">{project.title}</Link>
         </h3>
-        <p className="mt-2 line-clamp-3 text-sm leading-7 text-muted-foreground text-pretty">{project.description}</p>
+        <ProjectDescription content={project.description} clamp={3} className="mt-2 text-sm" />
         <div className="mt-auto space-y-3 pt-4">
           <TechPills techs={techs} />
           <div className="flex items-center justify-between gap-3">

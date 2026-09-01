@@ -538,6 +538,11 @@ fetch(url, { next: { revalidate: 3600 } });
       { key: "logoText", value: "dev.net" },
       { key: "heroBadge", value: "توسعه‌دهنده فول‌استک · کانال تخصصی" },
       { key: "heroTagline", value: "درباره‌ی کد و معماری می‌نویسم" },
+      {
+        key: "heroDescription",
+        value:
+          "توسعه‌دهنده ارشد وب و متخصص PHP — علاقه‌مند به یادگیری معماری نرم‌افزار و توسعه و نگهداری پروداکت",
+      },
       { key: "homeAboutTitle", value: "درباره‌ی من" },
       {
         key: "homeAboutText",

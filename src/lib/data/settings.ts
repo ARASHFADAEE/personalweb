@@ -6,6 +6,7 @@ export type Settings = {
   logoText: string;
   heroBadge: string;
   heroTagline: string;
+  heroDescription: string;
   homeAboutTitle: string;
   homeAboutText: string;
   authorName: string;
@@ -32,6 +33,8 @@ const DEFAULTS: Settings = {
   logoText: "dev.net",
   heroBadge: "توسعه‌دهنده فول‌استک · کانال تخصصی",
   heroTagline: "درباره‌ی کد و معماری می‌نویسم",
+  heroDescription:
+    "توسعه‌دهنده ارشد وب و متخصص PHP — علاقه‌مند به یادگیری معماری نرم‌افزار و توسعه و نگهداری پروداکت",
   homeAboutTitle: "درباره‌ی من",
   homeAboutText:
     "من علاقه‌مند به ساخت محصول‌های سریع، قابل‌نگهداری و با تجربه‌ی کاربری خوبم. در اینجا درباره‌ی چالش‌های واقعی و راه‌حل‌هایی که پیدا می‌کنم می‌نویسم — نه چیزهای تئوریک و بی‌کاربرد.",
@@ -79,6 +82,12 @@ export async function getSettings(): Promise<Settings> {
       logoText: pick("logoText"),
       heroBadge: pick("heroBadge"),
       heroTagline: pick("heroTagline"),
+      heroDescription:
+        "heroDescription" in map
+          ? map.heroDescription
+          : "authorBio" in map
+            ? map.authorBio
+            : DEFAULTS.heroDescription,
       homeAboutTitle: pick("homeAboutTitle"),
       homeAboutText: pick("homeAboutText"),
       authorName: pick("authorName"),

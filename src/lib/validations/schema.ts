@@ -102,6 +102,7 @@ export const settingsSchema = z.object({
   logoText: z.string().max(40),
   heroBadge: z.string().max(120),
   heroTagline: z.string().max(160),
+  heroDescription: z.string().max(1000),
   homeAboutTitle: z.string().max(80),
   homeAboutText: z.string().max(2000),
   authorName: z.string().max(120),

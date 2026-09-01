@@ -86,6 +86,8 @@ type Props = {
   editorKey: string;
   onMarkdownChange?: (markdown: string) => void;
   editorRef?: React.Ref<MDXEditorMethods>;
+  variant?: "full" | "compact";
+  placeholder?: string;
 };
 
 export function PostMdxEditor({
@@ -93,10 +95,88 @@ export function PostMdxEditor({
   editorKey,
   onMarkdownChange,
   editorRef,
+  variant = "full",
+  placeholder,
 }: Props) {
   const innerRef = React.useRef<MDXEditorMethods>(null);
+  const isCompact = variant === "compact";
 
   React.useImperativeHandle(editorRef, () => innerRef.current as MDXEditorMethods);
+
+  const plugins = React.useMemo(() => {
+    if (isCompact) {
+      return [
+        listsPlugin(),
+        quotePlugin(),
+        linkPlugin(),
+        linkDialogPlugin(),
+        markdownShortcutPlugin(),
+        toolbarPlugin({
+          toolbarContents: () => (
+            <>
+              <UndoRedo />
+              <Separator />
+              <BoldItalicUnderlineToggles />
+              <Separator />
+              <ListsToggle />
+              <Separator />
+              <CreateLink />
+            </>
+          ),
+        }),
+      ];
+    }
+
+    return [
+      headingsPlugin(),
+      listsPlugin(),
+      quotePlugin(),
+      thematicBreakPlugin(),
+      linkPlugin(),
+      linkDialogPlugin(),
+      tablePlugin(),
+      codeBlockPlugin({
+        defaultCodeBlockLanguage: "text",
+        codeBlockEditorDescriptors: [
+          { priority: -10, match: () => true, Editor: CodeMirrorEditor },
+        ],
+      }),
+      codeMirrorPlugin({ codeBlockLanguages: CODE_BLOCK_LANGUAGES }),
+      markdownShortcutPlugin(),
+      imagePlugin({ imageUploadHandler: uploadEditorImage }),
+      toolbarPlugin({
+        toolbarContents: () => (
+          <ConditionalContents
+            options={[
+              {
+                when: (editor) => editor?.editorType === "codeblock",
+                contents: () => <ChangeCodeMirrorLanguage />,
+              },
+              {
+                fallback: () => (
+                  <>
+                    <UndoRedo />
+                    <Separator />
+                    <BlockTypeSelect />
+                    <BoldItalicUnderlineToggles />
+                    <CodeToggle />
+                    <Separator />
+                    <ListsToggle />
+                    <Separator />
+                    <CreateLink />
+                    <InsertImage />
+                    <InsertTable />
+                    <InsertThematicBreak />
+                    <InsertCodeBlock />
+                  </>
+                ),
+              },
+            ]}
+          />
+        ),
+      }),
+    ];
+  }, [isCompact]);
 
   return (
     <MDXEditor
@@ -104,57 +184,18 @@ export function PostMdxEditor({
       ref={innerRef}
       markdown={initialMarkdown}
       onChange={(md) => onMarkdownChange?.(sanitizeEditorMarkdown(md))}
-      plugins={[
-        headingsPlugin(),
-        listsPlugin(),
-        quotePlugin(),
-        thematicBreakPlugin(),
-        linkPlugin(),
-        linkDialogPlugin(),
-        tablePlugin(),
-        codeBlockPlugin({
-          defaultCodeBlockLanguage: "text",
-          codeBlockEditorDescriptors: [
-            { priority: -10, match: () => true, Editor: CodeMirrorEditor },
-          ],
-        }),
-        codeMirrorPlugin({ codeBlockLanguages: CODE_BLOCK_LANGUAGES }),
-        markdownShortcutPlugin(),
-        imagePlugin({ imageUploadHandler: uploadEditorImage }),
-        toolbarPlugin({
-          toolbarContents: () => (
-            <ConditionalContents
-              options={[
-                {
-                  when: (editor) => editor?.editorType === "codeblock",
-                  contents: () => <ChangeCodeMirrorLanguage />,
-                },
-                {
-                  fallback: () => (
-                    <>
-                      <UndoRedo />
-                      <Separator />
-                      <BlockTypeSelect />
-                      <BoldItalicUnderlineToggles />
-                      <CodeToggle />
-                      <Separator />
-                      <ListsToggle />
-                      <Separator />
-                      <CreateLink />
-                      <InsertImage />
-                      <InsertTable />
-                      <InsertThematicBreak />
-                      <InsertCodeBlock />
-                    </>
-                  ),
-                },
-              ]}
-            />
-          ),
-        }),
-      ]}
-      placeholder="شروع به نوشتن کنید… (Markdown پشتیبانی می‌شود)"
-      contentEditableClassName="prose-article min-h-[420px] p-5 text-right text-foreground caret-foreground"
+      plugins={plugins}
+      placeholder={
+        placeholder ??
+        (isCompact
+          ? "توضیح کوتاه پروژه را بنویسید…"
+          : "شروع به نوشتن کنید… (Markdown پشتیبانی می‌شود)")
+      }
+      contentEditableClassName={
+        isCompact
+          ? "prose-article min-h-[140px] p-4 text-right text-sm leading-7 text-foreground caret-foreground"
+          : "prose-article min-h-[420px] p-5 text-right text-foreground caret-foreground"
+      }
     />
   );
 }

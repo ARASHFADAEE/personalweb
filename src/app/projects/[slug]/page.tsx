@@ -14,6 +14,8 @@ import { ProjectCard } from "@/components/project-card";
 import { ShareButtons } from "@/components/share-buttons";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { ProjectDescription } from "@/components/project-description";
+import { plainTextFromMarkdown } from "@/lib/slug";
 
 type Params = Promise<{ slug: string }>;
 
@@ -23,23 +25,24 @@ export async function generateMetadata({ params }: { params: Params }): Promise<
   if (!project) return { title: "پروژه یافت نشد", robots: { index: false } };
 
   const settings = await getSettings();
+  const description = plainTextFromMarkdown(project.description, 160);
   return {
     title: project.title,
-    description: project.description,
+    description,
     alternates: { canonical: `/projects/${project.slug}` },
     openGraph: {
       type: "article",
       locale: "fa_IR",
       siteName: settings.siteName,
       title: project.title,
-      description: project.description,
+      description,
       url: `/projects/${project.slug}`,
       images: project.coverImage ? [{ url: project.coverImage, width: 1200, height: 630, alt: project.title }] : undefined,
     },
     twitter: {
       card: project.coverImage ? "summary_large_image" : "summary",
       title: project.title,
-      description: project.description,
+      description,
       images: project.coverImage ? [project.coverImage] : undefined,
     },
   };
@@ -69,7 +72,7 @@ export default async function ProjectDetailPage({ params }: { params: Params }) 
     "@context": "https://schema.org",
     "@type": "SoftwareApplication",
     name: project.title,
-    description: project.description,
+    description: plainTextFromMarkdown(project.description, 160),
     applicationCategory: "DeveloperApplication",
     ...(project.repoUrl ? { codeRepository: project.repoUrl } : {}),
     ...(project.demoUrl ? { url: project.demoUrl } : {}),
@@ -106,9 +109,10 @@ export default async function ProjectDetailPage({ params }: { params: Params }) 
               <h1 className="text-balance text-3xl font-extrabold leading-[1.15] tracking-tight sm:text-4xl lg:text-[2.75rem]">
                 {project.title}
               </h1>
-              <p className="mt-4 max-w-3xl text-balance text-base leading-8 text-muted-foreground text-pretty sm:text-lg">
-                {project.description}
-              </p>
+              <ProjectDescription
+                content={project.description}
+                className="mt-4 max-w-3xl text-base sm:text-lg [&_p]:leading-8"
+              />
 
               <div className="mt-6 flex flex-wrap items-center gap-3">
                 {project.demoUrl && (

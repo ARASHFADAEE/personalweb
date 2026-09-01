@@ -2,6 +2,7 @@
 
 import * as React from "react";
 import { useRouter } from "next/navigation";
+import type { MDXEditorMethods } from "@mdxeditor/editor";
 import { Loader2, Save, Send, Trash2, X, Plus } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -11,9 +12,14 @@ import { Switch } from "@/components/ui/switch";
 import { Badge } from "@/components/ui/badge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
-import { slugify } from "@/lib/slug";
+import { plainTextFromMarkdown, slugify } from "@/lib/slug";
 import { MediaPickerButton } from "@/components/admin/media-picker-button";
 import { PublishSuccessModal } from "@/components/admin/publish-success-modal";
+import {
+  MdxEditorErrorBoundary,
+  PostMdxEditor,
+  sanitizeEditorMarkdown,
+} from "@/components/admin/post-mdx-editor";
 
 type ProjectData = {
   id?: string; title: string; slug: string; description: string; content: string;
@@ -24,6 +30,10 @@ type ProjectData = {
 export function ProjectEditor({ initial }: { initial: ProjectData | null }) {
   const router = useRouter();
   const { toast } = useToast();
+  const descriptionRef = React.useRef<MDXEditorMethods>(null);
+  const descriptionContentRef = React.useRef(sanitizeEditorMarkdown(initial?.description ?? ""));
+  const [descriptionSession, setDescriptionSession] = React.useState(0);
+
   const [data, setData] = React.useState<ProjectData>(initial ?? {
     title: "", slug: "", description: "", content: "", coverImage: "",
     technologies: [], demoUrl: "", repoUrl: "", featured: false, status: "PUBLISHED", sortOrder: 0,
@@ -35,6 +45,14 @@ export function ProjectEditor({ initial }: { initial: ProjectData | null }) {
 
   const update = (patch: Partial<ProjectData>) => setData((p) => ({ ...p, ...patch }));
 
+  const getDescriptionMarkdown = React.useCallback(() => {
+    const live = descriptionRef.current?.getMarkdown();
+    if (typeof live === "string") {
+      return sanitizeEditorMarkdown(live);
+    }
+    return descriptionContentRef.current;
+  }, []);
+
   const addTech = () => {
     const t = techInput.trim();
     if (t && !data.technologies.includes(t)) {
@@ -45,12 +63,18 @@ export function ProjectEditor({ initial }: { initial: ProjectData | null }) {
   const removeTech = (t: string) => update({ technologies: data.technologies.filter((x) => x !== t) });
 
   const save = async (status?: string) => {
-    if (!data.title.trim() || !data.description.trim()) {
+    const description = getDescriptionMarkdown();
+    if (!data.title.trim() || !plainTextFromMarkdown(description, 10_000).trim()) {
       toast({ variant: "destructive", title: "عنوان و توضیحات الزامی است" });
       return;
     }
     setSaving(true);
-    const payload = { ...data, slug: slugify(data.slug) || slugify(data.title), ...(status ? { status } : {}) };
+    const payload = {
+      ...data,
+      description,
+      slug: slugify(data.slug) || slugify(data.title),
+      ...(status ? { status } : {}),
+    };
     try {
       const url = data.id ? `/api/admin/projects/${data.id}` : "/api/admin/projects";
       const method = data.id ? "PUT" : "POST";
@@ -77,10 +101,13 @@ export function ProjectEditor({ initial }: { initial: ProjectData | null }) {
           ...prev,
           id: saved.id ?? prev.id,
           slug: saved.slug ?? prev.slug,
+          description: saved.description ?? description,
           status: isPublish ? "PUBLISHED" : prev.status,
         }));
+        descriptionContentRef.current = saved.description ?? description;
       } else if (isPublish) {
-        update({ status: "PUBLISHED" });
+        update({ status: "PUBLISHED", description });
+        descriptionContentRef.current = description;
       }
 
       if (!isPublish && !data.id && saved?.id) {
@@ -107,6 +134,8 @@ export function ProjectEditor({ initial }: { initial: ProjectData | null }) {
     router.push("/admin/projects");
     router.refresh();
   };
+
+  const descriptionEditorKey = `${data.id ?? "new"}-desc-${descriptionSession}`;
 
   return (
     <div className="space-y-5">
@@ -138,7 +167,22 @@ export function ProjectEditor({ initial }: { initial: ProjectData | null }) {
           </div>
           <div>
             <Label htmlFor="desc">توضیحات کوتاه</Label>
-            <Textarea id="desc" value={data.description} onChange={(e) => update({ description: e.target.value })} rows={2} className="mt-1.5" />
+            <div className="admin-mdx-editor mt-1.5 overflow-hidden rounded-xl border border-border" dir="rtl">
+              <MdxEditorErrorBoundary onRetry={() => setDescriptionSession((n) => n + 1)}>
+                <PostMdxEditor
+                  editorKey={descriptionEditorKey}
+                  editorRef={descriptionRef}
+                  initialMarkdown={descriptionContentRef.current}
+                  onMarkdownChange={(md) => {
+                    descriptionContentRef.current = md;
+                  }}
+                  variant="compact"
+                />
+              </MdxEditorErrorBoundary>
+            </div>
+            <p className="mt-1.5 text-xs text-muted-foreground">
+              از **پررنگ**، *کج*، لیست و لینک پشتیبانی می‌شود.
+            </p>
           </div>
           <div>
             <Label htmlFor="content">محتوای کامل (Markdown)</Label>

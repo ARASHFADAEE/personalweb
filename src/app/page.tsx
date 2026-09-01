@@ -19,6 +19,7 @@ import { Badge } from "@/components/ui/badge";
 import { formatJalali } from "@/lib/jalali";
 import { formatCount } from "@/lib/slug";
 import { HeroStatusBadge } from "@/components/hero-status-badge";
+import { ProjectDescription } from "@/components/project-description";
 
 export const revalidate = 60;
 
@@ -38,12 +39,6 @@ export default async function HomePage() {
     featuredPostsRaw.length > 0
       ? latestPosts.filter((p) => !featuredPostsRaw.some((f) => f.id === p.id))
       : latestPosts.slice(featuredPosts.length);
-
-  const stats = [
-    { label: "مقالات", value: formatCount(postsCount) },
-    { label: "دسته‌بندی", value: formatCount(categories.length) },
-    { label: "پروژه", value: formatCount(projects.length) },
-  ];
 
   return (
     <div className="flex min-h-screen flex-col">
@@ -74,12 +69,12 @@ export default async function HomePage() {
                 </Badge>
                 <h1 className="text-balance text-4xl font-extrabold leading-[1.15] tracking-tight sm:text-5xl lg:text-6xl">
                   {settings.authorName}
-                  <span className="block bg-gradient-to-l from-primary via-primary to-primary/60 bg-clip-text text-transparent">
+                  <span className="mt-[10px] block bg-gradient-to-l from-primary via-primary to-primary/60 bg-clip-text text-3xl text-transparent sm:text-4xl lg:text-5xl">
                     {settings.heroTagline}
                   </span>
                 </h1>
                 <p className="mx-auto mt-6 max-w-2xl text-balance text-lg leading-8 text-muted-foreground text-pretty lg:mx-0">
-                  {settings.authorBio}
+                  {settings.heroDescription}
                 </p>
 
                 <div className="mt-8 flex flex-wrap items-center justify-center gap-3 lg:justify-start">
@@ -117,15 +112,6 @@ export default async function HomePage() {
                     </a>
                   )}
                 </div>
-
-                <dl className="mx-auto mt-12 grid max-w-md grid-cols-3 gap-4 lg:mx-0">
-                  {stats.map((s) => (
-                    <div key={s.label} className="rounded-xl border border-border/70 bg-card/60 p-4 text-center">
-                      <dt className="text-xs text-muted-foreground">{s.label}</dt>
-                      <dd className="mt-1 font-mono text-2xl font-bold">{s.value}</dd>
-                    </div>
-                  ))}
-                </dl>
               </div>
 
               <div className="relative mx-auto w-full max-w-md">
@@ -267,7 +253,7 @@ export default async function HomePage() {
                       <h3 className="text-lg font-bold leading-7 tracking-tight">
                         <Link href={`/projects/${proj.slug}`} className="transition-colors hover:text-primary">{proj.title}</Link>
                       </h3>
-                      <p className="mt-1.5 line-clamp-2 text-sm leading-6 text-muted-foreground">{proj.description}</p>
+                      <ProjectDescription content={proj.description} clamp={2} className="mt-1.5 text-sm leading-6" />
                       {techs.length > 0 && (
                         <div className="mt-3 flex flex-wrap gap-1.5">
                           {techs.map((t) => (

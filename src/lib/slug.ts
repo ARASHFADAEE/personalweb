@@ -44,6 +44,11 @@ export function excerptFromContent(content: string, length = 160): string {
   return plain.slice(0, length).trim() + "…";
 }
 
+/** Plain text from markdown — useful for meta descriptions and validation. */
+export function plainTextFromMarkdown(content: string, length = 160): string {
+  return excerptFromContent(content, length);
+}
+
 export function uniqueSlug(
   base: string,
   exists: (slug: string) => Promise<boolean>

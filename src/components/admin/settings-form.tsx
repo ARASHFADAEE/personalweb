@@ -69,6 +69,17 @@ export function SettingsForm({ initial }: { initial: Settings }) {
             <Field label="زیرعنوان Hero (خط رنگی)">
               <Input value={data.heroTagline} onChange={(e) => update({ heroTagline: e.target.value })} placeholder="درباره‌ی کد و معماری می‌نویسم" />
             </Field>
+            <Field label="متن معرفی (زیر عنوان)">
+              <Textarea
+                value={data.heroDescription}
+                onChange={(e) => update({ heroDescription: e.target.value })}
+                rows={4}
+                placeholder="توسعه‌دهنده ارشد وب و متخصص PHP — علاقه‌مند به یادگیری معماری نرم‌افزار و توسعه و نگهداری پروداکت"
+              />
+              <p className="mt-1 text-xs text-muted-foreground">
+                پاراگراف توضیحی زیر نام و زیرعنوان در بالای صفحه اصلی نمایش داده می‌شود.
+              </p>
+            </Field>
           </Card>
         </TabsContent>
 
@@ -80,7 +91,7 @@ export function SettingsForm({ initial }: { initial: Settings }) {
             <Field label="نام نویسنده">
               <Input value={data.authorName} onChange={(e) => update({ authorName: e.target.value })} placeholder="مثلاً آرش فدایی" />
             </Field>
-            <Field label="بیوگرافی کوتاه (Hero و درباره)">
+            <Field label="بیوگرافی کوتاه (صفحه درباره و بخش آشنایی)">
               <Textarea value={data.authorBio} onChange={(e) => update({ authorBio: e.target.value })} rows={4} />
             </Field>
             <Field label="عنوان بخش «درباره من» در صفحه اصلی">
