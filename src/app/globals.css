@@ -221,24 +221,28 @@
 @layer components {
   .prose-article {
     color: var(--foreground);
-    font-size: 1.0625rem;
-    line-height: 2;
+    font-size: 1.125rem;
+    line-height: 2.05;
     letter-spacing: -0.003em;
+    max-width: 720px;
   }
   @media (max-width: 640px) {
     .prose-article {
-      font-size: 1rem;
-      line-height: 1.95;
+      font-size: 1.0625rem;
+      line-height: 2;
     }
     .prose-article h2 {
-      font-size: 1.375rem;
+      font-size: 1.5rem;
     }
     .prose-article h3 {
-      font-size: 1.15rem;
+      font-size: 1.25rem;
+    }
+    .prose-article h4 {
+      font-size: 1.125rem;
     }
   }
   .prose-article > * + * {
-    margin-top: 1.4em;
+    margin-top: 1.25rem;
   }
   .prose-article h2,
   .prose-article h3,
@@ -246,28 +250,31 @@
     scroll-margin-top: 6rem;
     font-weight: 700;
     letter-spacing: -0.02em;
-    line-height: 1.4;
+    color: var(--foreground);
   }
   .prose-article h2 {
-    font-size: 1.625rem;
-    margin-top: 2.4em;
-    margin-bottom: 0.8em;
-    padding-bottom: 0.4em;
+    font-size: 1.875rem;
+    line-height: 1.35;
+    margin-top: 3rem;
+    margin-bottom: 1rem;
+    padding-bottom: 0.5rem;
     border-bottom: 1px solid var(--border);
   }
   .prose-article h3 {
-    font-size: 1.3rem;
-    margin-top: 2em;
-    margin-bottom: 0.6em;
+    font-size: 1.5rem;
+    line-height: 1.4;
+    margin-top: 2rem;
+    margin-bottom: 0.75rem;
   }
   .prose-article h4 {
-    font-size: 1.1rem;
-    margin-top: 1.6em;
-    margin-bottom: 0.5em;
+    font-size: 1.25rem;
+    line-height: 1.45;
+    margin-top: 1.5rem;
+    margin-bottom: 0.5rem;
   }
   .prose-article p {
-    margin-top: 1.3em;
-    margin-bottom: 1.3em;
+    margin-top: 1.15rem;
+    margin-bottom: 1.15rem;
   }
   .prose-article a {
     color: var(--primary);
@@ -280,7 +287,7 @@
     color: var(--accent-foreground);
   }
   .prose-article strong {
-    font-weight: 700;
+    font-weight: 600;
     color: var(--foreground);
   }
   .prose-article ul,
@@ -338,6 +345,71 @@
     border: 1px solid var(--border);
     width: 100%;
     height: auto;
+  }
+  .article-inline-figure {
+    margin: 1.5rem 0;
+  }
+  .article-inline-caption {
+    margin-top: 0.625rem;
+    text-align: center;
+    font-size: 0.8125rem;
+    line-height: 1.6;
+    color: var(--muted-foreground);
+  }
+  .article-callout {
+    margin: 1.5rem 0;
+    border-radius: 0.875rem;
+    border: 1px solid var(--border);
+    border-right-width: 3px;
+    padding: 1rem 1.125rem;
+    background: color-mix(in oklch, var(--muted) 45%, transparent);
+  }
+  .article-callout-label {
+    margin: 0 0 0.5rem;
+    font-size: 0.75rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+  .article-callout-body {
+    font-size: 0.9375rem;
+    line-height: 1.95;
+    color: var(--foreground);
+  }
+  .article-callout-body p {
+    margin: 0.35rem 0;
+  }
+  .article-callout--info,
+  .article-callout--note {
+    border-right-color: var(--info);
+  }
+  .article-callout--info .article-callout-label,
+  .article-callout--note .article-callout-label {
+    color: var(--info);
+  }
+  .article-callout--tip {
+    border-right-color: var(--success);
+  }
+  .article-callout--tip .article-callout-label {
+    color: var(--success);
+  }
+  .article-callout--warning {
+    border-right-color: var(--warning);
+  }
+  .article-callout--warning .article-callout-label {
+    color: var(--warning);
+  }
+  .article-callout--important {
+    border-right-color: var(--primary);
+  }
+  .article-callout--important .article-callout-label {
+    color: var(--primary);
+  }
+  .article-callout--success {
+    border-right-color: var(--success);
+  }
+  .article-callout--success .article-callout-label {
+    color: var(--success);
   }
   .prose-article table {
     width: 100%;

@@ -102,8 +102,8 @@ export function CodeBlock({ language, code, showLineNumbers = false }: CodeBlock
         <span className="code-block-lang">{lang}</span>
         <button
           onClick={copy}
-          className="inline-flex items-center gap-1.5 rounded-md px-2 py-1 text-xs text-muted-foreground transition-colors hover:bg-white/5 hover:text-foreground"
-          aria-label="کپی کد"
+          className="inline-flex min-h-9 min-w-[4.5rem] items-center justify-center gap-1.5 rounded-md px-2 py-1 text-xs text-muted-foreground transition-colors hover:bg-white/5 hover:text-foreground"
+          aria-label={copied ? "کد کپی شد" : "کپی کد"}
         >
           {copied ? (
             <><Check className="h-3.5 w-3.5 text-success" /> کپی شد</>

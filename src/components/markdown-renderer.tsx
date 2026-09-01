@@ -5,8 +5,25 @@ import ReactMarkdown from "react-markdown";
 import Link from "next/link";
 import { CodeBlock } from "@/components/code-block";
 import { slugifyHeading, type Heading } from "@/lib/headings";
+import { cn } from "@/lib/utils";
 
-type Props = { content: string; headings?: Heading[] };
+type Props = {
+  content: string;
+  headings?: Heading[];
+  coverImage?: string | null;
+};
+
+const CALLOUT_TYPES = ["INFO", "TIP", "WARNING", "IMPORTANT", "SUCCESS", "NOTE"] as const;
+type CalloutType = (typeof CALLOUT_TYPES)[number];
+
+const CALLOUT_LABELS: Record<CalloutType, string> = {
+  INFO: "اطلاعات",
+  TIP: "نکته",
+  WARNING: "هشدار",
+  IMPORTANT: "مهم",
+  SUCCESS: "موفقیت",
+  NOTE: "یادداشت",
+};
 
 function getHeadingText(children: React.ReactNode): string {
   if (typeof children === "string") return children;
@@ -16,6 +33,13 @@ function getHeadingText(children: React.ReactNode): string {
     return getHeadingText(children.props.children);
   }
   return "";
+}
+
+function parseCallout(text: string): { type: CalloutType; body: string } | null {
+  const match = /^\[!(INFO|TIP|WARNING|IMPORTANT|SUCCESS|NOTE)\]\s*/i.exec(text.trim());
+  if (!match) return null;
+  const type = match[1].toUpperCase() as CalloutType;
+  return { type, body: text.trim().slice(match[0].length).trim() };
 }
 
 function useHeadingIdAssigner() {
@@ -63,9 +87,10 @@ function createHeadingComponent(
   };
 }
 
-export function MarkdownRenderer({ content, headings }: Props) {
+export function MarkdownRenderer({ content, headings, coverImage }: Props) {
   const assignId = useHeadingIdAssigner();
   const headingIndexRef = React.useRef(0);
+  const skippedCoverRef = React.useRef(false);
 
   const components = React.useMemo(
     () => ({
@@ -87,6 +112,31 @@ export function MarkdownRenderer({ content, headings }: Props) {
             {children}
           </Link>
         );
+      },
+      blockquote: ({ children }: { children?: React.ReactNode }) => {
+        const childArray = React.Children.toArray(children);
+        const firstText = childArray.length > 0 ? getHeadingText(childArray[0]) : getHeadingText(children);
+        const callout = parseCallout(firstText);
+
+        if (callout) {
+          const type = callout.type === "NOTE" ? "INFO" : callout.type;
+          const restFromFirst = firstText.replace(/^\[!(INFO|TIP|WARNING|IMPORTANT|SUCCESS|NOTE)\]\s*/i, "").trim();
+          const restNodes = childArray.slice(1);
+          return (
+            <aside
+              className={cn("article-callout", `article-callout--${type.toLowerCase()}`)}
+              role="note"
+              aria-label={CALLOUT_LABELS[type]}
+            >
+              <p className="article-callout-label">{CALLOUT_LABELS[type]}</p>
+              <div className="article-callout-body">
+                {restFromFirst && <p>{restFromFirst}</p>}
+                {restNodes}
+              </div>
+            </aside>
+          );
+        }
+        return <blockquote>{children}</blockquote>;
       },
       code: ({
         className,
@@ -111,13 +161,37 @@ export function MarkdownRenderer({ content, headings }: Props) {
         );
       },
       pre: ({ children }: { children?: React.ReactNode }) => <>{children}</>,
-      img: ({ src, alt, ...props }: React.ImgHTMLAttributes<HTMLImageElement>) =>
-        src ? (
-          // eslint-disable-next-line @next/next/no-img-element
-          <img src={typeof src === "string" ? src : ""} alt={alt ?? ""} {...props} />
-        ) : null,
+      img: ({ src, alt, title, ...props }: React.ImgHTMLAttributes<HTMLImageElement>) => {
+        const srcStr = typeof src === "string" ? src : "";
+        if (!srcStr) return null;
+
+        if (
+          coverImage &&
+          !skippedCoverRef.current &&
+          (srcStr === coverImage || srcStr.endsWith(coverImage) || coverImage.endsWith(srcStr))
+        ) {
+          skippedCoverRef.current = true;
+          return null;
+        }
+
+        return (
+          <figure className="article-inline-figure">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src={srcStr}
+              alt={alt?.trim() || ""}
+              loading="lazy"
+              decoding="async"
+              {...props}
+            />
+            {(title || alt) && (
+              <figcaption className="article-inline-caption">{title || alt}</figcaption>
+            )}
+          </figure>
+        );
+      },
     }),
-    [assignId, headings]
+    [assignId, headings, coverImage]
   );
 
   return (

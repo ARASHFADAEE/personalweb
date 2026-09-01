@@ -140,20 +140,38 @@ export async function getLatestPosts(limit = 6, excludeIds: string[] = []) {
   });
 }
 
-export async function getRelatedPosts(postId: string, categoryId?: string | null, limit = 3) {
-  return db.post.findMany({
+export async function getRelatedPosts(
+  postId: string,
+  categoryId?: string | null,
+  tagIds: string[] = [],
+  limit = 3
+) {
+  const candidates = await db.post.findMany({
     where: {
       ...PUBLISHED_WHERE,
       id: { not: postId },
-      ...(categoryId ? { categoryId } : {}),
     },
     orderBy: { publishedAt: "desc" },
-    take: limit,
+    take: 24,
     include: {
       category: true,
       author: { select: { id: true, name: true } },
+      tags: { include: { tag: { select: { id: true, name: true, slug: true } } } },
     },
   });
+
+  const scored = candidates
+    .map((post) => {
+      let score = 0;
+      if (categoryId && post.categoryId === categoryId) score += 10;
+      const sharedTags = post.tags.filter((t) => tagIds.includes(t.tag.id)).length;
+      score += sharedTags * 4;
+      const publishedAt = post.publishedAt?.getTime() ?? 0;
+      return { post, score, publishedAt };
+    })
+    .sort((a, b) => b.score - a.score || b.publishedAt - a.publishedAt);
+
+  return scored.slice(0, limit).map(({ post }) => post);
 }
 
 export async function getAdjacentPosts(publishedAt: Date) {

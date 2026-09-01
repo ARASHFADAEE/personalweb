@@ -65,30 +65,37 @@ export async function getSettings(): Promise<Settings> {
     const rows = await db.setting.findMany();
     const map: Record<string, string> = {};
     for (const r of rows) map[r.key] = r.value;
+
+    const pick = <K extends keyof Settings>(key: K): Settings[K] => {
+      if (!(key in map)) return DEFAULTS[key];
+      const raw = map[key as string];
+      if (key === "newsletterEnabled") return (raw === "true") as Settings[K];
+      return raw as Settings[K];
+    };
+
     const result: Settings = {
-      ...DEFAULTS,
-      ...(map.siteName ? { siteName: map.siteName } : {}),
-      ...(map.siteDescription ? { siteDescription: map.siteDescription } : {}),
-      ...(map.logoText ? { logoText: map.logoText } : {}),
-      ...(map.heroBadge ? { heroBadge: map.heroBadge } : {}),
-      ...(map.heroTagline ? { heroTagline: map.heroTagline } : {}),
-      ...(map.homeAboutTitle ? { homeAboutTitle: map.homeAboutTitle } : {}),
-      ...(map.homeAboutText ? { homeAboutText: map.homeAboutText } : {}),
-      ...(map.authorName ? { authorName: map.authorName } : {}),
-      ...(map.authorBio ? { authorBio: map.authorBio } : {}),
-      ...(map.authorAvatar ? { authorAvatar: map.authorAvatar } : {}),
-      ...(map.socialGithub ? { socialGithub: map.socialGithub } : {}),
-      ...(map.socialLinkedin ? { socialLinkedin: map.socialLinkedin } : {}),
-      ...(map.socialX ? { socialX: map.socialX } : {}),
-      ...(map.socialEmail ? { socialEmail: map.socialEmail } : {}),
-      ...(map.defaultSeoTitle ? { defaultSeoTitle: map.defaultSeoTitle } : {}),
-      ...(map.defaultSeoDescription ? { defaultSeoDescription: map.defaultSeoDescription } : {}),
-      ...(map.defaultOgImage ? { defaultOgImage: map.defaultOgImage } : {}),
-      ...(map.googleVerification ? { googleVerification: map.googleVerification } : {}),
-      ...(map.newsletterEnabled ? { newsletterEnabled: map.newsletterEnabled === "true" } : {}),
-      ...(map.analyticsProvider ? { analyticsProvider: map.analyticsProvider } : {}),
-      ...(map.analyticsScript ? { analyticsScript: map.analyticsScript } : {}),
-      ...(map.footerNote ? { footerNote: map.footerNote } : {}),
+      siteName: pick("siteName"),
+      siteDescription: pick("siteDescription"),
+      logoText: pick("logoText"),
+      heroBadge: pick("heroBadge"),
+      heroTagline: pick("heroTagline"),
+      homeAboutTitle: pick("homeAboutTitle"),
+      homeAboutText: pick("homeAboutText"),
+      authorName: pick("authorName"),
+      authorBio: pick("authorBio"),
+      authorAvatar: pick("authorAvatar"),
+      socialGithub: pick("socialGithub"),
+      socialLinkedin: pick("socialLinkedin"),
+      socialX: pick("socialX"),
+      socialEmail: pick("socialEmail"),
+      defaultSeoTitle: pick("defaultSeoTitle"),
+      defaultSeoDescription: pick("defaultSeoDescription"),
+      defaultOgImage: pick("defaultOgImage"),
+      googleVerification: pick("googleVerification"),
+      newsletterEnabled: pick("newsletterEnabled"),
+      analyticsProvider: pick("analyticsProvider"),
+      analyticsScript: pick("analyticsScript"),
+      footerNote: pick("footerNote"),
     };
     cache = result;
     cacheAt = now;

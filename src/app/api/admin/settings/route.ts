@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { revalidatePath } from "next/cache";
 import { getSettings, saveSettings } from "@/lib/data/settings";
 import { getSessionUser } from "@/lib/auth";
 
@@ -14,5 +15,12 @@ export async function PUT(req: Request) {
   if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   const body = await req.json();
   await saveSettings(body);
+
+  // Bust ISR/static cache so homepage, layout metadata, etc. pick up new settings.
+  revalidatePath("/", "layout");
+  revalidatePath("/");
+  revalidatePath("/about");
+  revalidatePath("/blog");
+
   return NextResponse.json({ ok: true });
 }
