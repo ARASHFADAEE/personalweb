@@ -11,6 +11,7 @@ async function main() {
   console.log("🌱 Seeding database...");
 
   // Reset (dev only)
+  await prisma.comment.deleteMany();
   await prisma.postView.deleteMany();
   await prisma.postTag.deleteMany();
   await prisma.tag.deleteMany();

@@ -1,7 +1,7 @@
 /**
  * Import posts from a Virgool RSS feed into the local blog database.
  * Downloads all images locally — no external source URLs kept.
- * Run: DATABASE_URL="file:../db/custom.db" npx tsx prisma/import-virgool.ts
+ * Run: npm run db:import-virgool
  */
 
 import { PrismaClient } from "@prisma/client";
