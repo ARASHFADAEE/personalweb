@@ -18,6 +18,12 @@ export type Settings = {
   socialEmail: string;
   defaultSeoTitle: string;
   defaultSeoDescription: string;
+  blogSeoTitle: string;
+  blogSeoDescription: string;
+  projectsSeoTitle: string;
+  projectsSeoDescription: string;
+  aboutSeoTitle: string;
+  aboutSeoDescription: string;
   defaultOgImage: string;
   googleVerification: string;
   newsletterEnabled: boolean;
@@ -46,9 +52,17 @@ const DEFAULTS: Settings = {
   socialLinkedin: "https://linkedin.com/",
   socialX: "",
   socialEmail: "hi@example.com",
-  defaultSeoTitle: "دِو‌نت — وبلاگ توسعه‌دهنده",
+  defaultSeoTitle: "دِو‌نت — وبلاگ شخصی یک توسعه‌دهنده",
   defaultSeoDescription:
     "مقالات تخصصی درباره‌ی Next.js، React و معماری نرم‌افزار، نوشته‌ی یک توسعه‌دهنده.",
+  blogSeoTitle: "وبلاگ",
+  blogSeoDescription:
+    "همه‌ی مقالات تخصصی درباره‌ی Next.js، React، DevOps، هوش مصنوعی و معماری نرم‌افزار.",
+  projectsSeoTitle: "پروژه‌ها",
+  projectsSeoDescription:
+    "مجموعه‌ای از پروژه‌های متن‌باز، ابزارها و محصولات فول‌استک — ساخته‌شده با تمرکز بر کد تمیز و UX.",
+  aboutSeoTitle: "درباره‌ی من",
+  aboutSeoDescription: "آشنایی با من، تخصص‌ها و مسیر حرفه‌ای.",
   defaultOgImage: "/og-default.png",
   googleVerification: "",
   newsletterEnabled: true,
@@ -99,6 +113,12 @@ export async function getSettings(): Promise<Settings> {
       socialEmail: pick("socialEmail"),
       defaultSeoTitle: pick("defaultSeoTitle"),
       defaultSeoDescription: pick("defaultSeoDescription"),
+      blogSeoTitle: pick("blogSeoTitle"),
+      blogSeoDescription: pick("blogSeoDescription"),
+      projectsSeoTitle: pick("projectsSeoTitle"),
+      projectsSeoDescription: pick("projectsSeoDescription"),
+      aboutSeoTitle: pick("aboutSeoTitle"),
+      aboutSeoDescription: pick("aboutSeoDescription"),
       defaultOgImage: pick("defaultOgImage"),
       googleVerification: pick("googleVerification"),
       newsletterEnabled: pick("newsletterEnabled"),

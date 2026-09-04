@@ -13,9 +13,14 @@ const IRANYEKANX_MONO_URL = "/fonts/IRANYekanXVF.woff2";
 
 export async function generateMetadata(): Promise<Metadata> {
   const settings = await getSettings();
-  const siteName = settings.siteName ?? "دِو‌نت";
-  const title = `${siteName} — وبلاگ شخصی یک توسعه‌دهنده`;
-  const description = settings.siteDescription ?? "مقالات تخصصی درباره Next.js، React، طراحی نرم‌افزار، DevOps و هوش مصنوعی — از تجربه‌ی واقعی یک توسعه‌دهنده.";
+  const siteName = settings.siteName || "دِو‌نت";
+  const title =
+    settings.defaultSeoTitle?.trim() ||
+    `${siteName} — وبلاگ شخصی یک توسعه‌دهنده`;
+  const description =
+    settings.defaultSeoDescription?.trim() ||
+    settings.siteDescription ||
+    "مقالات تخصصی درباره Next.js، React، طراحی نرم‌افزار، DevOps و هوش مصنوعی — از تجربه‌ی واقعی یک توسعه‌دهنده.";
 
   const siteUrl = getSiteUrl();
 
@@ -27,8 +32,8 @@ export async function generateMetadata(): Promise<Metadata> {
     },
     description,
     keywords: ["وبلاگ توسعه", "Next.js", "React", "برنامه‌نویسی", "DevOps", "هوش مصنوعی", "TypeScript", "طراحی نرم‌افزار"],
-    authors: [{ name: settings.authorName ?? "Developer" }],
-    creator: settings.authorName ?? "Developer",
+    authors: [{ name: settings.authorName || "Developer" }],
+    creator: settings.authorName || "Developer",
     publisher: siteName,
     icons: {
       icon: "/favicon.svg",
@@ -48,6 +53,7 @@ export async function generateMetadata(): Promise<Metadata> {
       card: "summary_large_image",
       title,
       description,
+      images: settings.defaultOgImage ? [settings.defaultOgImage] : undefined,
     },
     robots: {
       index: true,
@@ -58,7 +64,7 @@ export async function generateMetadata(): Promise<Metadata> {
       },
     },
     alternates: {
-      canonical: siteUrl,
+      canonical: "/",
       types: {
         "application/rss+xml": [{ url: "/rss.xml", title: siteName }],
       },

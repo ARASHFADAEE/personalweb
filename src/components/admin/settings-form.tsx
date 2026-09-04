@@ -49,8 +49,11 @@ export function SettingsForm({ initial }: { initial: Settings }) {
             <Field label="متن لوگو (header)">
               <Input value={data.logoText} onChange={(e) => update({ logoText: e.target.value })} className="font-mono text-left" dir="ltr" placeholder="dev.net" />
             </Field>
-            <Field label="توضیحات سایت (فوتر و متا)">
+            <Field label="توضیحات کوتاه سایت (فوتر)">
               <Textarea value={data.siteDescription} onChange={(e) => update({ siteDescription: e.target.value })} rows={3} />
+              <p className="mt-1 text-xs text-muted-foreground">
+                عنوان و متای صفحه اصلی را از تب «سئو» تنظیم کنید.
+              </p>
             </Field>
             <Field label="متن فوتر">
               <Input value={data.footerNote} onChange={(e) => update({ footerNote: e.target.value })} />
@@ -118,10 +121,95 @@ export function SettingsForm({ initial }: { initial: Settings }) {
 
         <TabsContent value="seo" className="space-y-4">
           <Card>
-            <Field label="عنوان سئو پیش‌فرض"><Input value={data.defaultSeoTitle} onChange={(e) => update({ defaultSeoTitle: e.target.value })} /></Field>
-            <Field label="توضیحات متا پیش‌فرض"><Textarea value={data.defaultSeoDescription} onChange={(e) => update({ defaultSeoDescription: e.target.value })} rows={2} /></Field>
-            <Field label="تصویر OG پیش‌فرض"><Input dir="ltr" value={data.defaultOgImage} onChange={(e) => update({ defaultOgImage: e.target.value })} className="text-left" placeholder="https://…" /></Field>
-            <Field label="کد تأیید گوگل (Google Search Console)"><Input dir="ltr" value={data.googleVerification} onChange={(e) => update({ googleVerification: e.target.value })} className="text-left" placeholder="google-site-verification=…" /></Field>
+            <p className="text-sm text-muted-foreground">
+              عنوان و توضیحات متا دقیقاً همان چیزی است که در گوگل نمایش داده می‌شود. برای هر صفحه جداگانه تنظیم کنید.
+            </p>
+            <Field label="عنوان سئو — صفحه اصلی">
+              <Input
+                value={data.defaultSeoTitle}
+                onChange={(e) => update({ defaultSeoTitle: e.target.value })}
+                placeholder="دِو‌نت — وبلاگ شخصی یک توسعه‌دهنده"
+              />
+            </Field>
+            <Field label="توضیحات متا — صفحه اصلی">
+              <Textarea
+                value={data.defaultSeoDescription}
+                onChange={(e) => update({ defaultSeoDescription: e.target.value })}
+                rows={2}
+              />
+            </Field>
+          </Card>
+
+          <Card>
+            <Field label="عنوان سئو — وبلاگ">
+              <Input
+                value={data.blogSeoTitle}
+                onChange={(e) => update({ blogSeoTitle: e.target.value })}
+                placeholder="وبلاگ"
+              />
+            </Field>
+            <Field label="توضیحات متا — وبلاگ">
+              <Textarea
+                value={data.blogSeoDescription}
+                onChange={(e) => update({ blogSeoDescription: e.target.value })}
+                rows={2}
+              />
+            </Field>
+          </Card>
+
+          <Card>
+            <Field label="عنوان سئو — پروژه‌ها">
+              <Input
+                value={data.projectsSeoTitle}
+                onChange={(e) => update({ projectsSeoTitle: e.target.value })}
+                placeholder="پروژه‌ها"
+              />
+            </Field>
+            <Field label="توضیحات متا — پروژه‌ها">
+              <Textarea
+                value={data.projectsSeoDescription}
+                onChange={(e) => update({ projectsSeoDescription: e.target.value })}
+                rows={2}
+              />
+            </Field>
+          </Card>
+
+          <Card>
+            <Field label="عنوان سئو — درباره‌ی من">
+              <Input
+                value={data.aboutSeoTitle}
+                onChange={(e) => update({ aboutSeoTitle: e.target.value })}
+                placeholder="درباره‌ی من"
+              />
+            </Field>
+            <Field label="توضیحات متا — درباره‌ی من">
+              <Textarea
+                value={data.aboutSeoDescription}
+                onChange={(e) => update({ aboutSeoDescription: e.target.value })}
+                rows={2}
+              />
+            </Field>
+          </Card>
+
+          <Card>
+            <Field label="تصویر OG پیش‌فرض (مسیر یا URL)">
+              <Input
+                dir="ltr"
+                value={data.defaultOgImage}
+                onChange={(e) => update({ defaultOgImage: e.target.value })}
+                className="text-left"
+                placeholder="/og-default.png یا https://…"
+              />
+            </Field>
+            <Field label="کد تأیید گوگل (Google Search Console)">
+              <Input
+                dir="ltr"
+                value={data.googleVerification}
+                onChange={(e) => update({ googleVerification: e.target.value })}
+                className="text-left"
+                placeholder="google-site-verification=…"
+              />
+            </Field>
           </Card>
         </TabsContent>
 

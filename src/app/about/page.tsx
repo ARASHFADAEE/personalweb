@@ -7,12 +7,18 @@ import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { buildPageMetadata } from "@/lib/page-seo";
+import { getSiteUrl } from "@/lib/site-url";
 
-export const metadata: Metadata = {
-  title: "درباره‌ی من",
-  description: "آشنایی با من، تخصص‌ها و مسیر حرفه‌ای.",
-  alternates: { canonical: "/about" },
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const settings = await getSettings();
+  return buildPageMetadata({
+    title: settings.aboutSeoTitle,
+    description: settings.aboutSeoDescription,
+    path: "/about",
+    settings,
+  });
+}
 
 export const revalidate = 3600;
 
@@ -27,7 +33,7 @@ export default async function AboutPage() {
     "@type": "Person",
     name: settings.authorName,
     description: settings.authorBio,
-    url: process.env.NEXT_PUBLIC_SITE_URL ?? "/",
+    url: getSiteUrl(),
     sameAs: [
       settings.socialGithub,
       settings.socialLinkedin,

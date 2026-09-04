@@ -550,6 +550,29 @@ fetch(url, { next: { revalidate: 3600 } });
           "من علاقه‌مند به ساخت محصول‌های سریع، قابل‌نگهداری و با تجربه‌ی کاربری خوبم. در اینجا درباره‌ی چالش‌های واقعی و راه‌حل‌هایی که پیدا می‌کنم می‌نویسم — نه چیزهای تئوریک و بی‌کاربرد.",
       },
       { key: "authorName", value: "آرش فدایی" },
+      {
+        key: "defaultSeoTitle",
+        value: "دِو‌نت — وبلاگ شخصی یک توسعه‌دهنده",
+      },
+      {
+        key: "defaultSeoDescription",
+        value:
+          "مقالات تخصصی درباره‌ی Next.js، React و معماری نرم‌افزار، نوشته‌ی یک توسعه‌دهنده.",
+      },
+      { key: "blogSeoTitle", value: "وبلاگ" },
+      {
+        key: "blogSeoDescription",
+        value:
+          "همه‌ی مقالات تخصصی درباره‌ی Next.js، React، DevOps، هوش مصنوعی و معماری نرم‌افزار.",
+      },
+      { key: "projectsSeoTitle", value: "پروژه‌ها" },
+      {
+        key: "projectsSeoDescription",
+        value:
+          "مجموعه‌ای از پروژه‌های متن‌باز، ابزارها و محصولات فول‌استک — ساخته‌شده با تمرکز بر کد تمیز و UX.",
+      },
+      { key: "aboutSeoTitle", value: "درباره‌ی من" },
+      { key: "aboutSeoDescription", value: "آشنایی با من، تخصص‌ها و مسیر حرفه‌ای." },
       { key: "newsletterEnabled", value: "true" },
     ],
   });

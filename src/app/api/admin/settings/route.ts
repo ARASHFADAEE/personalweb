@@ -21,6 +21,10 @@ export async function PUT(req: Request) {
   revalidatePath("/");
   revalidatePath("/about");
   revalidatePath("/blog");
+  revalidatePath("/projects");
+  revalidatePath("/sitemap.xml");
+  revalidatePath("/robots.txt");
+  revalidatePath("/rss.xml");
 
   return NextResponse.json({ ok: true });
 }

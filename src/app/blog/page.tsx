@@ -10,12 +10,17 @@ import { BlogExplorer } from "@/components/blog-explorer";
 import { ArticleCard } from "@/components/article-card";
 import { formatCount } from "@/lib/slug";
 import { Badge } from "@/components/ui/badge";
+import { buildPageMetadata } from "@/lib/page-seo";
 
-export const metadata: Metadata = {
-  title: "وبلاگ",
-  description: "همه‌ی مقالات تخصصی درباره‌ی Next.js، React، DevOps، هوش مصنوعی و معماری نرم‌افزار.",
-  alternates: { canonical: "/blog" },
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const settings = await getSettings();
+  return buildPageMetadata({
+    title: settings.blogSeoTitle,
+    description: settings.blogSeoDescription,
+    path: "/blog",
+    settings,
+  });
+}
 
 export const revalidate = 600;
 

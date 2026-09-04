@@ -20,8 +20,20 @@ import { formatJalali } from "@/lib/jalali";
 import { formatCount } from "@/lib/slug";
 import { HeroStatusBadge } from "@/components/hero-status-badge";
 import { ProjectDescription } from "@/components/project-description";
+import { buildPageMetadata } from "@/lib/page-seo";
+import { getSiteUrl } from "@/lib/site-url";
 
 export const revalidate = 60;
+
+export async function generateMetadata(): Promise<Metadata> {
+  const settings = await getSettings();
+  return buildPageMetadata({
+    title: settings.defaultSeoTitle,
+    description: settings.defaultSeoDescription || settings.siteDescription,
+    path: "/",
+    settings,
+  });
+}
 
 export default async function HomePage() {
   const settings = await getSettings();
@@ -40,8 +52,37 @@ export default async function HomePage() {
       ? latestPosts.filter((p) => !featuredPostsRaw.some((f) => f.id === p.id))
       : latestPosts.slice(featuredPosts.length);
 
+  const siteUrl = getSiteUrl();
+  const jsonLd = {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "WebSite",
+        name: settings.siteName,
+        url: siteUrl,
+        description: settings.defaultSeoDescription || settings.siteDescription,
+        inLanguage: "fa-IR",
+        publisher: {
+          "@type": "Person",
+          name: settings.authorName,
+        },
+      },
+      {
+        "@type": "Person",
+        name: settings.authorName,
+        description: settings.authorBio,
+        url: siteUrl,
+        sameAs: [settings.socialGithub, settings.socialLinkedin, settings.socialX].filter(Boolean),
+      },
+    ],
+  };
+
   return (
     <div className="flex min-h-screen flex-col">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+      />
       <SiteHeader settings={settings} />
 
       <main className="flex-1">

@@ -14,12 +14,25 @@ type Params = Promise<{ slug: string }>;
 
 export async function generateMetadata({ params }: { params: Params }): Promise<Metadata> {
   const { slug } = await params;
-  const tag = await db.tag.findUnique({ where: { slug } });
+  const [tag, settings] = await Promise.all([
+    db.tag.findUnique({ where: { slug } }),
+    getSettings(),
+  ]);
   if (!tag) return { title: "تگ یافت نشد", robots: { index: false } };
+  const title = `#${tag.name}`;
+  const description = `مقالات با تگ ${tag.name}`;
   return {
-    title: `#${tag.name}`,
-    description: `مقالات با تگ ${tag.name}`,
+    title,
+    description,
     alternates: { canonical: `/tags/${tag.slug}` },
+    openGraph: {
+      title,
+      description,
+      url: `/tags/${tag.slug}`,
+      siteName: settings.siteName,
+      locale: "fa_IR",
+      type: "website",
+    },
   };
 }
 

@@ -39,7 +39,7 @@ export async function GET() {
     <title>${escape(settings.siteName)}</title>
     <link>${baseUrl}</link>
     <atom:link href="${baseUrl}/rss.xml" rel="self" type="application/rss+xml" />
-    <description>${escape(settings.siteDescription)}</description>
+    <description>${escape(settings.defaultSeoDescription || settings.siteDescription)}</description>
     <language>fa-IR</language>
     <lastBuildDate>${new Date().toUTCString()}</lastBuildDate>
     <generator>dev.net — Next.js blog</generator>

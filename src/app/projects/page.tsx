@@ -20,12 +20,17 @@ import { ProjectCard } from "@/components/project-card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { formatCount } from "@/lib/slug";
+import { buildPageMetadata } from "@/lib/page-seo";
 
-export const metadata: Metadata = {
-  title: "پروژه‌ها",
-  description: "مجموعه‌ای از پروژه‌های متن‌باز، ابزارها و محصولات فول‌استک — ساخته‌شده با تمرکز بر کد تمیز و UX.",
-  alternates: { canonical: "/projects" },
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const settings = await getSettings();
+  return buildPageMetadata({
+    title: settings.projectsSeoTitle,
+    description: settings.projectsSeoDescription,
+    path: "/projects",
+    settings,
+  });
+}
 
 export const revalidate = 60;
 

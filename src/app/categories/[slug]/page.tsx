@@ -14,12 +14,28 @@ type Params = Promise<{ slug: string }>;
 
 export async function generateMetadata({ params }: { params: Params }): Promise<Metadata> {
   const { slug } = await params;
-  const category = await db.category.findUnique({ where: { slug } });
+  const [category, settings] = await Promise.all([
+    db.category.findUnique({ where: { slug } }),
+    getSettings(),
+  ]);
   if (!category) return { title: "دسته‌بندی یافت نشد", robots: { index: false } };
+  const title = category.seoTitle || category.name;
+  const description =
+    category.metaDescription ||
+    category.description ||
+    `مقالات دسته‌بندی ${category.name}`;
   return {
-    title: category.seoTitle || category.name,
-    description: category.metaDescription || category.description || `مقالات دسته‌بندی ${category.name}`,
+    title,
+    description,
     alternates: { canonical: `/categories/${category.slug}` },
+    openGraph: {
+      title,
+      description,
+      url: `/categories/${category.slug}`,
+      siteName: settings.siteName,
+      locale: "fa_IR",
+      type: "website",
+    },
   };
 }
 
