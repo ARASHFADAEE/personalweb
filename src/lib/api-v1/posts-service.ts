@@ -5,6 +5,7 @@ import { applyPostSeoDefaults } from "@/lib/post-seo";
 import { ApiError } from "@/lib/api-v1/errors";
 import { revalidatePath } from "next/cache";
 import { getSiteUrl } from "@/lib/site-url";
+import { normalizeMarkdownTables } from "@/lib/markdown-tables";
 
 const optionalUrl = z
   .string()
@@ -223,7 +224,7 @@ export async function createOrUpsertPost(input: PublishPostBody) {
     throw new ApiError(422, "INVALID_SCHEDULE", "برای SCHEDULED مقدار scheduledAt الزامی است");
   }
 
-  const content = input.content;
+  const content = normalizeMarkdownTables(input.content);
   const excerpt = input.excerpt?.trim() || null;
   const coverImage = input.coverImage?.trim() || null;
   const readingTime = readingTimeFromContent(content);

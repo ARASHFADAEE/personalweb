@@ -33,14 +33,17 @@ import {
 } from "@mdxeditor/editor";
 import "@mdxeditor/editor/style.css";
 import { Button } from "@/components/ui/button";
+import { normalizeMarkdownTables } from "@/lib/markdown-tables";
 
 /** Strip characters that often break Lexical / MDX parsing after paste. */
 export function sanitizeEditorMarkdown(input: string): string {
-  return input
-    .replace(/\0/g, "")
-    .replace(/[\u0001-\u0008\u000B\u000C\u000E-\u001F]/g, "")
-    .replace(/\uFEFF/g, "")
-    .replace(/\r\n/g, "\n");
+  return normalizeMarkdownTables(
+    input
+      .replace(/\0/g, "")
+      .replace(/[\u0001-\u0008\u000B\u000C\u000E-\u001F]/g, "")
+      .replace(/\uFEFF/g, "")
+      .replace(/\r\n/g, "\n")
+  );
 }
 
 async function uploadEditorImage(file: File): Promise<string> {

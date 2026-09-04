@@ -2,9 +2,11 @@
 
 import * as React from "react";
 import ReactMarkdown from "react-markdown";
+import remarkGfm from "remark-gfm";
 import Link from "next/link";
 import { CodeBlock } from "@/components/code-block";
 import { slugifyHeading, type Heading } from "@/lib/headings";
+import { normalizeMarkdownTables } from "@/lib/markdown-tables";
 import { cn } from "@/lib/utils";
 
 type Props = {
@@ -88,7 +90,7 @@ function createHeadingComponent(
 }
 
 function normalizeMarkdown(input: string): string {
-  return input.replace(/^\*\*\*\s*$/gm, "\n---\n");
+  return normalizeMarkdownTables(input.replace(/^\*\*\*\s*$/gm, "\n---\n"));
 }
 
 export function MarkdownRenderer({ content, headings, coverImage }: Props) {
@@ -143,6 +145,11 @@ export function MarkdownRenderer({ content, headings, coverImage }: Props) {
         }
         return <blockquote>{children}</blockquote>;
       },
+      table: ({ children, ...props }: React.TableHTMLAttributes<HTMLTableElement>) => (
+        <div className="article-table-wrap">
+          <table {...props}>{children}</table>
+        </div>
+      ),
       code: ({
         className,
         children,
@@ -205,7 +212,7 @@ export function MarkdownRenderer({ content, headings, coverImage }: Props) {
 
   return (
     <div className="prose-article">
-      <ReactMarkdown components={components} skipHtml>
+      <ReactMarkdown remarkPlugins={[remarkGfm]} components={components} skipHtml>
         {markdown}
       </ReactMarkdown>
     </div>

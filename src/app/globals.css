@@ -420,20 +420,45 @@
     width: 100%;
     border-collapse: collapse;
     font-size: 0.95em;
+    display: table;
+    min-width: 36rem;
+  }
+  .prose-article .article-table-wrap {
+    width: 100%;
+    max-width: 100%;
     overflow-x: auto;
-    display: block;
+    margin: 1.75rem 0;
+    border: 1px solid var(--border);
+    border-radius: 0.85rem;
+    background: var(--card);
+    -webkit-overflow-scrolling: touch;
+  }
+  .prose-article .article-table-wrap table {
+    margin: 0;
+    min-width: 100%;
+    border: 0;
   }
   .prose-article thead {
-    background: var(--muted);
+    background: color-mix(in oklab, var(--muted) 88%, var(--primary) 12%);
   }
   .prose-article th,
   .prose-article td {
     border: 1px solid var(--border);
-    padding: 0.65em 1em;
+    padding: 0.75em 1em;
     text-align: right;
+    vertical-align: top;
+    line-height: 1.7;
   }
   .prose-article th {
-    font-weight: 600;
+    font-weight: 700;
+    color: var(--foreground);
+    white-space: nowrap;
+  }
+  .prose-article tbody tr:nth-child(even) {
+    background: color-mix(in oklab, var(--muted) 45%, transparent);
+  }
+  .prose-article tbody tr:hover {
+    background: color-mix(in oklab, var(--primary) 6%, transparent);
   }
 }
 
