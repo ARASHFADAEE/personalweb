@@ -17,6 +17,7 @@ npm run dev
 - `DATABASE_URL` — اتصال **pooled** به Postgres (روی Vercel: `arsh_DATABASE_URL` یا `POSTGRES_PRISMA_URL`)
 - `DIRECT_URL` — اتصال **مستقیم** فقط برای migrate/push (روی Vercel: `arsh_POSTGRES_URL` یا `POSTGRES_URL_NON_POOLING`)
 - `NEXT_PUBLIC_SITE_URL` — آدرس عمومی سایت (برای sitemap و OG)
+- `PUBLISH_API_*` — برای API انتشار مقاله از سیستم خارجی (جزئیات: [`docs/API_PUBLISH.md`](docs/API_PUBLISH.md))
 
 ### Vercel Postgres
 
