@@ -10,11 +10,9 @@ import {
   Edit,
   Trash2,
   Eye,
-  EyeOff,
   Globe,
   Clock,
   PenLine,
-  ExternalLink,
   CheckSquare,
   Square,
 } from "lucide-react";
@@ -250,33 +248,57 @@ export function PostManager({
                       {p.publishedAt ? formatJalaliShort(p.publishedAt) : formatJalaliShort(p.createdAt)}
                     </TableCell>
                     <TableCell>
-                      <DropdownMenu>
-                        <DropdownMenuTrigger asChild>
-                          <Button variant="ghost" size="icon" className="h-8 w-8">
-                            <MoreHorizontal className="h-4 w-4" />
-                          </Button>
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent align="end" className="min-w-44">
-                          <DropdownMenuItem asChild>
-                            <Link href={`/admin/posts/${p.id}/edit`}>
-                              <Edit className="ms-2 h-4 w-4" /> ویرایش
+                      <div className="flex items-center justify-end gap-0.5">
+                        {p.slug && (
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            className="h-8 w-8 text-muted-foreground hover:text-foreground"
+                            asChild
+                          >
+                            <Link
+                              href={`/blog/${p.slug}`}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              aria-label="مشاهده مقاله"
+                              title={
+                                p.status === "PUBLISHED"
+                                  ? "مشاهده مقاله"
+                                  : "مشاهده (اگر منتشر نشده باشد ممکن است در دسترس نباشد)"
+                              }
+                            >
+                              <Eye className="h-4 w-4" />
                             </Link>
-                          </DropdownMenuItem>
-                          {p.status === "PUBLISHED" && (
+                          </Button>
+                        )}
+                        <DropdownMenu>
+                          <DropdownMenuTrigger asChild>
+                            <Button variant="ghost" size="icon" className="h-8 w-8">
+                              <MoreHorizontal className="h-4 w-4" />
+                            </Button>
+                          </DropdownMenuTrigger>
+                          <DropdownMenuContent align="end" className="min-w-44">
                             <DropdownMenuItem asChild>
-                              <Link href={`/blog/${p.slug}`} target="_blank">
-                                <ExternalLink className="ms-2 h-4 w-4" /> مشاهده
+                              <Link href={`/admin/posts/${p.id}/edit`}>
+                                <Edit className="ms-2 h-4 w-4" /> ویرایش
                               </Link>
                             </DropdownMenuItem>
-                          )}
-                          <DropdownMenuItem
-                            onClick={() => deleteOne(p.id)}
-                            className="text-destructive focus:text-destructive"
-                          >
-                            <Trash2 className="ms-2 h-4 w-4" /> حذف
-                          </DropdownMenuItem>
-                        </DropdownMenuContent>
-                      </DropdownMenu>
+                            {p.slug && (
+                              <DropdownMenuItem asChild>
+                                <Link href={`/blog/${p.slug}`} target="_blank" rel="noopener noreferrer">
+                                  <Eye className="ms-2 h-4 w-4" /> مشاهده مقاله
+                                </Link>
+                              </DropdownMenuItem>
+                            )}
+                            <DropdownMenuItem
+                              onClick={() => deleteOne(p.id)}
+                              className="text-destructive focus:text-destructive"
+                            >
+                              <Trash2 className="ms-2 h-4 w-4" /> حذف
+                            </DropdownMenuItem>
+                          </DropdownMenuContent>
+                        </DropdownMenu>
+                      </div>
                     </TableCell>
                   </TableRow>
                 ))

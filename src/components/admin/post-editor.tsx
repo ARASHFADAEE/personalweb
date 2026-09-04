@@ -293,6 +293,23 @@ export function PostEditor({
           </p>
         </div>
         <div className="flex flex-wrap items-center gap-2">
+          {data.slug && (
+            <Button variant="outline" size="sm" asChild className="gap-1.5">
+              <a
+                href={`/blog/${data.slug}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                title={
+                  data.status === "PUBLISHED"
+                    ? "مشاهده مقاله در سایت"
+                    : "مشاهده (اگر منتشر نشده باشد ممکن است در دسترس نباشد)"
+                }
+              >
+                <Eye className="h-4 w-4" />
+                مشاهده مقاله
+              </a>
+            </Button>
+          )}
           {data.id && (
             <Button variant="ghost" size="sm" onClick={remove} className="gap-1.5 text-destructive">
               <Trash2 className="h-4 w-4" /> حذف
