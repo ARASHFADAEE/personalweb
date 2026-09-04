@@ -12,10 +12,12 @@ import {
 } from "@/components/ui/tabs";
 import { useToast } from "@/hooks/use-toast";
 import type { Settings } from "@/lib/data/settings";
+import { ChangePasswordForm } from "@/components/admin/change-password-form";
 
 export function SettingsForm({ initial }: { initial: Settings }) {
   const [data, setData] = React.useState<Settings>(initial);
   const [saving, setSaving] = React.useState(false);
+  const [tab, setTab] = React.useState("general");
   const { toast } = useToast();
   const update = (patch: Partial<Settings>) => setData((p) => ({ ...p, ...patch }));
 
@@ -30,11 +32,12 @@ export function SettingsForm({ initial }: { initial: Settings }) {
 
   return (
     <div className="space-y-5">
-      <Tabs defaultValue="general">
+      <Tabs value={tab} onValueChange={setTab}>
         <TabsList>
           <TabsTrigger value="general">عمومی</TabsTrigger>
           <TabsTrigger value="author">نویسنده</TabsTrigger>
           <TabsTrigger value="seo">سئو</TabsTrigger>
+          <TabsTrigger value="account">حساب کاربری</TabsTrigger>
           <TabsTrigger value="analytics">تحلیل</TabsTrigger>
         </TabsList>
 
@@ -213,6 +216,10 @@ export function SettingsForm({ initial }: { initial: Settings }) {
           </Card>
         </TabsContent>
 
+        <TabsContent value="account" className="space-y-4">
+          <ChangePasswordForm />
+        </TabsContent>
+
         <TabsContent value="analytics" className="space-y-4">
           <Card>
             <div className="space-y-2">
@@ -226,12 +233,14 @@ export function SettingsForm({ initial }: { initial: Settings }) {
         </TabsContent>
       </Tabs>
 
-      <div className="flex justify-end">
-        <Button onClick={save} disabled={saving} className="gap-2">
-          {saving ? <Loader2 className="h-4 w-4 animate-spin" /> : <Save className="h-4 w-4" />}
-          ذخیره‌ی تنظیمات
-        </Button>
-      </div>
+      {tab !== "account" && (
+        <div className="flex justify-end">
+          <Button onClick={save} disabled={saving} className="gap-2">
+            {saving ? <Loader2 className="h-4 w-4 animate-spin" /> : <Save className="h-4 w-4" />}
+            ذخیره‌ی تنظیمات
+          </Button>
+        </div>
+      )}
     </div>
   );
 }

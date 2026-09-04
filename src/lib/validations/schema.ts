@@ -10,6 +10,22 @@ export const loginSchema = z.object({
 });
 export type LoginInput = z.infer<typeof loginSchema>;
 
+export const changePasswordSchema = z
+  .object({
+    currentPassword: z.string().min(1, "رمز فعلی الزامی است"),
+    newPassword: z.string().min(8, "رمز جدید حداقل ۸ کاراکتر باشد"),
+    confirmPassword: z.string().min(1, "تأیید رمز الزامی است"),
+  })
+  .refine((data) => data.newPassword === data.confirmPassword, {
+    message: "رمز جدید و تأیید آن یکسان نیستند",
+    path: ["confirmPassword"],
+  })
+  .refine((data) => data.currentPassword !== data.newPassword, {
+    message: "رمز جدید باید با رمز فعلی متفاوت باشد",
+    path: ["newPassword"],
+  });
+export type ChangePasswordInput = z.infer<typeof changePasswordSchema>;
+
 // ---------------------------------------------------------------------------
 // Categories
 // ---------------------------------------------------------------------------
